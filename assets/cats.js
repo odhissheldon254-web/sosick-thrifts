@@ -59,7 +59,7 @@
 
   function price(p) { return p.price == null ? "Ask for price" : "KES " + Number(p.price).toLocaleString("en-KE"); }
   function orderHref(p) {
-    return "./?item=" + encodeURIComponent(p.name + (p.price == null ? "" : " (KES " + Number(p.price).toLocaleString("en-KE") + ")") + " from Sosick") + "#order";
+    return "shop.html?item=" + encodeURIComponent(p.name + (p.price == null ? "" : " (KES " + Number(p.price).toLocaleString("en-KE") + ")") + " from Sosick") + "#order";
   }
   function productCard(p) {
     var c = byId(p.category);
@@ -113,7 +113,7 @@
     document.getElementById("cTitle").textContent = c.short;
     document.getElementById("cTag").textContent = c.tagline;
     document.getElementById("cPlugsTitle").textContent = "Verified Plugs for " + c.short.toLowerCase();
-    document.getElementById("cOrder").href = "./?item=" + encodeURIComponent(c.item) + "#order";
+    document.getElementById("cOrder").href = "shop.html?item=" + encodeURIComponent(c.item) + "#order";
     document.getElementById("cOrder").textContent = "Order " + c.short.toLowerCase() + " from any shop";
     document.getElementById("cHunt").href = waLink("Hi Sosick! I'm looking for " + c.label.toLowerCase() + ". Can you help? I want: ");
 
@@ -140,6 +140,6 @@
     load(),
     S.supabaseUrl ? api("plugs?select=name,category,area,sells,link,level,tested&status=eq.live&order=tested.desc.nullslast").then(function (r) { plugs = r; }, function () {}) : null
   ]).then(function () {
-    if (!show() && !shown) location.replace("./#categories");
+    if (!show() && !shown) location.replace("shop.html#categories");
   });
 })();

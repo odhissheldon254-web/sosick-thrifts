@@ -191,7 +191,7 @@
   function writeUrl() { try { history.replaceState(null, "", shareUrl().replace(location.origin, "")); } catch (e) {} }
 
   $("orderFit").addEventListener("click", function () {
-    location.href = "./?item=" + encodeURIComponent(summary()) + "#order";
+    location.href = "shop.html?item=" + encodeURIComponent(summary()) + "#order";
   });
   $("askFit").addEventListener("click", function () {
     window.open(waLink("Hi Sosick! I matched this fit on your site and want it:\n" + summary() + "\n" + shareUrl(), true), "_blank", "noopener");

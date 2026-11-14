@@ -1,451 +1,1149 @@
 <!doctype html>
 <html lang="en">
 <head>
-<title>Sosick</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="Sosick: order anything in Nairobi and we pick it up and deliver it. Plus Verified Plugs, sellers we have tested ourselves.">
-<meta name="theme-color" content="#FFD21F">
+<title>Sosick · Thrift, handmade beads &amp; Verified Plugs in Nairobi</title>
+<meta name="description" content="Sosick: our own thrift shoes, clothes and handmade beads, plus Nairobi sellers we've tested ourselves. We bring it to you and you pay after you check it.">
+<meta name="theme-color" content="#0E0D0B">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=202611151200">
-<link rel="stylesheet" href="assets/fancy.css?v=202611151200">
-<link rel="stylesheet" href="assets/depth.css?v=202611151200">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Familjen+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: a scroll-driven ride through a 3D mini-Nairobi at dusk. The city fills the screen; each "stop" is a matatu-plate card over it. */
+:root {
+  --night: #0E0D0B;   /* sky top, ink */
+  --tarmac: #1A1813;  /* card ground */
+  --sun: #FFD21F;     /* brand yellow */
+  --amber: #FF9F1C;   /* dusk glow */
+  --chalk: #FFF6D6;   /* text */
+  --dim: #BDB391;     /* secondary text */
+  --f-display: "Dela Gothic One", "Arial Black", Impact, sans-serif;
+  --f-body: "Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { background: var(--night); }
+body { background: var(--night); color: var(--chalk); font: 400 17px/1.5 var(--f-body); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--night); }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--sun); outline-offset: 3px; }
+.mono { font-family: var(--f-mono); }
+
+/* the 3D city sits behind everything */
+#city { position: fixed; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; }
+.fallback-sky { position: fixed; inset: 0; z-index: 0; background: linear-gradient(180deg, #0E0D0B 0%, #2A1E0E 55%, #FF9F1C 100%); }
+.vignette { position: fixed; inset: 0; z-index: 1; pointer-events: none;
+  background: radial-gradient(120% 90% at 60% 45%, transparent 55%, rgba(14,13,11,.55) 100%); }
+
+/* header */
+.bar { position: fixed; top: env(safe-area-inset-top, 0px); left: 0; right: 0; z-index: 20;
+  padding: 12px max(16px, env(safe-area-inset-right, 0px)) 12px max(16px, env(safe-area-inset-left, 0px));
+  display: flex; align-items: center; gap: 12px; }
+.bar img { height: 38px; width: auto; }
+.concept { font: 700 .66rem/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--night); background: var(--chalk); padding: 6px 8px; border-radius: 3px; }
+.bar .shopbtn { margin-left: auto; }
+@media (max-width: 760px) { .bar .shopbtn { display: none; } .bar .wa { margin-left: auto; } }
+.btn { display: inline-flex; align-items: center; gap: 8px; font: 700 1rem/1 var(--f-body); text-decoration: none; padding: 14px 18px; border-radius: 4px; border: 2px solid var(--sun); cursor: pointer; transition: transform .15s, background .15s, color .15s; }
+.btn:hover { transform: translateY(-2px); }
+.btn-sun { background: var(--sun); color: var(--night); }
+.btn-line { background: rgba(14,13,11,.55); color: var(--sun); }
+.btn-sm { padding: 10px 13px; font-size: .9rem; }
+
+/* route rail (which stop you're at) */
+.rail { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); top: 50%; transform: translateY(-50%); z-index: 15;
+  list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.rail::before { content: ""; position: absolute; right: 7px; top: 10px; bottom: 10px; width: 2px; background: repeating-linear-gradient(var(--sun) 0 6px, transparent 6px 12px); opacity: .5; }
+.rail a { position: relative; display: flex; align-items: center; justify-content: flex-end; gap: 10px; text-decoration: none; padding: 6px 0;
+  font: 700 .68rem/1 var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
+.rail a::after { content: ""; width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--sun); background: var(--night); flex: none; transition: background .2s, transform .2s; }
+.rail a[aria-current="step"] { color: var(--sun); }
+.rail a[aria-current="step"]::after { background: var(--sun); transform: scale(1.25); }
+.rail span { opacity: 0; transform: translateX(6px); transition: opacity .2s, transform .2s; }
+.rail a[aria-current="step"] span, .rail:hover span { opacity: 1; transform: none; }
+
+/* chapters */
+main { position: relative; z-index: 5; }
+.chap { min-height: 125svh; display: flex; align-items: center;
+  padding-block: 90px 60px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.chap-in { width: 100%; max-width: 1180px; margin: 0 auto; }
+.hero { min-height: 100svh; align-items: flex-end; padding-bottom: 72px; position: relative; }
+.hero::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(90deg, rgba(14,13,11,.82) 0%, rgba(14,13,11,.55) 45%, transparent 75%), linear-gradient(0deg, rgba(14,13,11,.7) 0%, transparent 55%); }
+@media (max-width: 760px) { .hero::before { background: linear-gradient(0deg, rgba(14,13,11,.92) 0%, rgba(14,13,11,.6) 55%, transparent 85%); } }
+.hero h1 { font: 400 clamp(2.9rem, 8.5vw, 7rem)/0.92 var(--f-display); margin: 0 0 22px; letter-spacing: -.01em; text-wrap: balance;
+  text-shadow: 0 4px 30px rgba(14,13,11,.6); max-width: 11ch; }
+.hero h1 em { font-style: normal; color: var(--sun); }
+.hero p { font-size: clamp(1.05rem, 2vw, 1.3rem); max-width: 50ch; margin: 0 0 24px; font-weight: 500; text-shadow: 0 2px 16px rgba(14,13,11,.8); }
+.hero p b { color: var(--sun); }
+.ctas { display: flex; flex-wrap: wrap; gap: 12px; }
+.chips { list-style: none; padding: 0; margin: 22px 0 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.chips li { font: 700 .74rem/1 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; padding: 8px 10px; border-radius: 3px; background: rgba(14,13,11,.7); border: 1.5px solid rgba(255,210,31,.45); color: var(--chalk); }
+
+/* the matatu-plate stop card */
+.stop { width: min(460px, 100%); background: rgba(20,18,14,.86); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  border: 2px solid var(--sun); border-radius: 6px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,.45); }
+.stop.right { margin-left: auto; margin-right: 56px; }
+.plate { display: flex; justify-content: space-between; gap: 10px; background: var(--sun); color: var(--night); padding: 9px 14px;
+  font: 700 .74rem/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; }
+.stop-body { padding: 20px 20px 22px; display: grid; gap: 14px; }
+.stop h2 { font: 400 clamp(1.8rem, 4vw, 2.5rem)/1 var(--f-display); margin: 0; text-wrap: balance; }
+.stop p { margin: 0; color: var(--dim); }
+.stop p strong { color: var(--chalk); }
+.slip { background: var(--chalk); color: var(--night); border-radius: 3px; padding: 14px 14px 16px; font: 500 .82rem/1.55 var(--f-mono);
+  -webkit-mask: radial-gradient(circle 6px at 50% 100%, transparent 98%, #000) 0 0 / 14px 100% repeat-x;
+          mask: radial-gradient(circle 6px at 50% 100%, transparent 98%, #000) 0 0 / 14px 100% repeat-x; padding-bottom: 20px; }
+.slip-top { display: flex; justify-content: space-between; font-weight: 700; border-bottom: 2px dashed var(--night); padding-bottom: 6px; margin-bottom: 8px; }
+.slip dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; }
+.slip dt { font-weight: 700; }
+.slip dd { margin: 0; }
+.slip small { display: block; margin-top: 8px; opacity: .65; }
+.checks { list-style: none; counter-reset: c; margin: 0; padding: 0; display: grid; gap: 7px; }
+.checks li { counter-increment: c; display: grid; grid-template-columns: 26px 1fr; gap: 10px; align-items: start; color: var(--dim); font-size: .95rem; }
+.checks li::before { content: counter(c); width: 26px; height: 26px; border-radius: 50%; background: var(--sun); color: var(--night); display: grid; place-items: center; font: 700 .78rem/1 var(--f-mono); }
+.checks b { color: var(--chalk); }
+.cats { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.cats li { font-size: .84rem; font-weight: 600; padding: 6px 9px; border-radius: 3px; background: rgba(255,246,214,.08); border: 1px solid rgba(255,246,214,.18); }
+.cats i { font-style: normal; display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 6px; vertical-align: 0; }
+.tiers { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.tiers li { background: rgba(255,210,31,.1); border: 1px solid rgba(255,210,31,.35); border-radius: 4px; padding: 8px; font-size: .78rem; line-height: 1.3; color: var(--dim); }
+.tiers b { display: block; color: var(--sun); font-size: .9rem; margin-bottom: 2px; }
+.places { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.places li { font: 500 .78rem/1 var(--f-mono); padding: 7px 9px; border-radius: 3px; background: rgba(255,210,31,.12); color: var(--chalk); }
+.places.soon li { background: transparent; border: 1px dashed rgba(255,246,214,.35); color: var(--dim); }
+.num { font: 700 clamp(1.7rem, 5vw, 2.4rem)/1 var(--f-mono); color: var(--sun); letter-spacing: .02em; user-select: all; }
+.end h2 { font-size: clamp(2.2rem, 6vw, 3.6rem); }
+.foot { font: 500 .74rem/1.5 var(--f-mono); color: var(--dim); margin-top: 6px; }
+.hero .drag-note { margin: 18px 0 0; font-size: .7rem; text-shadow: none; } .drag-note { font: 700 .7rem/1 var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--dim); margin-top: 16px; }
+
+/* Sosi: the shopping-bag helper */
+.sosi-fab { position: fixed; z-index: 25; border: 0; background: none; padding: 0; cursor: pointer;
+  right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: flex; align-items: center; gap: 10px; }
+.sosi-bubble { background: var(--chalk); color: var(--night); font: 700 .86rem/1.3 var(--f-body); padding: 9px 12px; border-radius: 12px 12px 3px 12px;
+  max-width: 230px; text-align: left; box-shadow: 0 8px 24px rgba(0,0,0,.4); transition: opacity .25s, transform .25s; }
+.sosi-bubble.is-hidden { opacity: 0; transform: translateY(6px); pointer-events: none; }
+.sosi-face { position: relative; width: 62px; height: 62px; flex: none; border-radius: 20px 20px 24px 24px; background: var(--sun);
+  border: 3px solid var(--night); box-shadow: 0 0 0 3px var(--sun), 0 10px 30px rgba(255,210,31,.35); animation: sosiBob 3s ease-in-out infinite; }
+.sosi-face::before { content: ""; position: absolute; left: 50%; top: -15px; width: 26px; height: 15px; transform: translateX(-50%);
+  border: 3px solid var(--sun); border-bottom: 0; border-radius: 14px 14px 0 0; }
+.sosi-face i { position: absolute; display: block; }
+.sosi-face .eye { top: 18px; width: 9px; height: 13px; background: var(--night); border-radius: 50%; animation: sosiBlink 5s infinite; }
+.sosi-face .eye:nth-child(1) { left: 15px; } .sosi-face .eye:nth-child(2) { right: 15px; }
+.sosi-face .mouth { left: 50%; bottom: 12px; width: 20px; height: 10px; transform: translateX(-50%); border: 3px solid var(--night); border-top: 0; border-radius: 0 0 12px 12px; }
+.sosi-face.is-thinking .mouth { width: 10px; height: 10px; border: 3px solid var(--night); border-radius: 50%; }
+.sosi-face-sm { width: 38px; height: 38px; border-radius: 12px 12px 15px 15px; animation: none; box-shadow: none; border-width: 2.5px; }
+.sosi-face-sm::before { top: -10px; width: 15px; height: 10px; border-width: 2.5px; }
+.sosi-face-sm .eye { top: 10px; width: 6px; height: 8px; } .sosi-face-sm .eye:nth-child(1) { left: 8px; } .sosi-face-sm .eye:nth-child(2) { right: 8px; }
+.sosi-face-sm .mouth { bottom: 7px; width: 12px; height: 6px; border-width: 2.5px; }
+@keyframes sosiBob { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-6px) rotate(2deg); } }
+@keyframes sosiBlink { 0%,46%,50%,100% { transform: scaleY(1); } 48% { transform: scaleY(.1); } }
+.sosi-panel { position: fixed; z-index: 26; right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  width: min(390px, calc(100vw - 32px)); height: min(580px, calc(100svh - 110px)); display: flex; flex-direction: column;
+  background: var(--tarmac); border: 2px solid var(--sun); border-radius: 10px; overflow: hidden; box-shadow: 0 24px 70px rgba(0,0,0,.6); }
+.sosi-top { display: flex; align-items: center; gap: 12px; padding: 16px 12px 12px 16px; background: var(--sun); color: var(--night); }
+.sosi-top .sosi-face-sm { background: var(--sun); border-color: var(--night); }
+.sosi-top .sosi-face-sm::before { border-color: var(--night); }
+.sosi-id { display: grid; line-height: 1.15; margin-right: auto; }
+.sosi-id strong { font: 400 1.1rem/1 var(--f-display); }
+.sosi-id small { font: 700 .66rem/1.3 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; }
+.sosi-toggle, .sosi-x { white-space: nowrap; flex: none; border: 2px solid var(--night); background: transparent; color: var(--night); border-radius: 999px; cursor: pointer; font: 700 .74rem/1 var(--f-mono); padding: 7px 9px; }
+.sosi-x { width: 34px; height: 34px; padding: 0; font-size: 1.2rem; }
+.sosi-log { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+.msg { max-width: 86%; padding: 10px 12px; border-radius: 12px; font-size: .95rem; line-height: 1.4; }
+.msg-bot { background: rgba(255,246,214,.08); border: 1px solid rgba(255,246,214,.14); align-self: flex-start; border-bottom-left-radius: 3px; }
+.msg-me { background: var(--sun); color: var(--night); align-self: flex-end; border-bottom-right-radius: 3px; font-weight: 600; }
+.msg a.msg-btn { display: inline-block; margin-top: 8px; background: var(--sun); color: var(--night); font-weight: 700; text-decoration: none; padding: 9px 12px; border-radius: 4px; }
+.msg-typing i { display: inline-block; width: 7px; height: 7px; margin-right: 4px; border-radius: 50%; background: var(--dim); animation: sosiDot 1s infinite; }
+.msg-typing i:nth-child(2) { animation-delay: .15s; } .msg-typing i:nth-child(3) { animation-delay: .3s; }
+@keyframes sosiDot { 0%,100% { opacity: .3; } 50% { opacity: 1; } }
+.sosi-chips { display: flex; gap: 6px; overflow-x: auto; padding: 0 14px 10px; scrollbar-width: none; }
+.sosi-chips button { flex: none; border: 1.5px solid rgba(255,210,31,.6); background: transparent; color: var(--chalk); border-radius: 999px; padding: 8px 11px; font: 600 .84rem/1 var(--f-body); cursor: pointer; }
+.sosi-chips button:hover { background: rgba(255,210,31,.15); }
+.sosi-input { display: flex; gap: 8px; padding: 10px 12px 12px; border-top: 1px solid rgba(255,246,214,.12); }
+.sosi-input input { flex: 1; min-width: 0; background: var(--night); color: var(--chalk); border: 1.5px solid rgba(255,246,214,.25); border-radius: 6px; padding: 11px 12px; font: 500 16px/1.2 var(--f-body); }
+.sosi-input button { border: 0; background: var(--sun); color: var(--night); border-radius: 6px; width: 46px; font-size: 1.1rem; cursor: pointer; }
+
+@media (max-width: 760px) {
+  .sosi-fab { bottom: calc(66px + env(safe-area-inset-bottom, 0px)); }
+  .sosi-face { width: 54px; height: 54px; }
+  .sosi-face .eye { top: 15px; } .sosi-face .eye:nth-child(1) { left: 12px; } .sosi-face .eye:nth-child(2) { right: 12px; }
+  .sosi-bubble { max-width: 190px; font-size: .8rem; }
+  .sosi-panel { height: min(560px, calc(100svh - 90px)); }
+}
+@media (prefers-reduced-motion: reduce) { .sosi-face, .sosi-face .eye, .msg-typing i { animation: none; } }
+
+@media (max-width: 760px) {
+  .rail { top: auto; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); right: 50%; transform: translateX(50%);
+    display: flex; gap: 14px; background: rgba(14,13,11,.8); padding: 8px 14px; border-radius: 999px; }
+  .rail::before { display: none; }
+  .rail span { display: none; }
+  .rail a { padding: 0; }
+  .chap { align-items: flex-end; padding-bottom: 76px; }
+  .stop.right { margin-right: 0; }
+  .bar img { height: 30px; }
+  .concept { display: none; }
+  .hero { padding-bottom: 80px; }
+}
+@media (prefers-reduced-motion: reduce) { .btn, .rail a::after, .rail span { transition: none; } }
+</style>
 </head>
 <body>
+<noscript><p style="padding:90px 16px;max-width:600px">Sosick needs JavaScript for the 3D street. You can still <a href="shop.html">order, track and find Verified Plugs here</a>, or WhatsApp 0112 275 881.</p></noscript>
+<canvas id="city" aria-hidden="true"></canvas>
+<div class="vignette" aria-hidden="true"></div>
 
-<header class="topbar">
-  <div class="wrap topbar-in">
-    <a class="brand" href="#top" aria-label="Sosick home">
-      <img class="brand-mark" src="assets/logo-wordmark.svg" alt="Sosick" width="150" height="44">
-    </a>
-    <nav class="nav" aria-label="Main">
-      <a href="#top" data-nav="home">Home</a>
-      <a href="outfit.html">Outfit Match</a>
-      <a href="#order" data-nav="order">Order</a>
-      <a href="#track" data-nav="track">Track</a>
-      <a href="#plugs" data-nav="plugs">Verified Plugs</a>
-      <a href="#info" data-nav="info">How &amp; where</a>
-    </nav>
-    <a class="btn btn-ink btn-sm wa-link" data-wa="Hi Sosick 👋" href="#" target="_blank" rel="noopener">WhatsApp us</a>
-  </div>
+<header class="bar">
+  <img src="assets/logo-wordmark-static.svg" alt="Sosick" width="129" height="38">
+  <a class="btn btn-line btn-sm shopbtn" href="shop.html#order">Order slip &amp; tracking</a>
+  <a class="btn btn-sun btn-sm wa" href="https://wa.me/254112275881?text=Hi%20Sosick%20%F0%9F%91%8B" target="_blank" rel="noopener">WhatsApp us</a>
 </header>
 
-<main id="top">
-
-  <div class="view view-home" data-view="home">
-  <!-- HERO: the two engines side by side, equal weight -->
-  <section class="hero">
-    <div class="wrap hero-grid">
-      <div class="hero-text">
-        <p class="sticker" id="comradeSticker">Comrade launch · just delivery, no extra charges</p>
-        <h1 class="hero-title">Order it.<br>We pick it.<br><span class="hl">We drop it.</span></h1>
-        <p class="hero-sub"><strong>Sosick is a delivery service in Nairobi.</strong> Tell us what you want from any shop, market or parcel office. A Sosick rider picks it up and brings it to your gate, hostel or office. You pay when it arrives.</p>
-        <div class="hero-ctas">
-          <a class="btn btn-ink btn-lg" href="#order">Order something now →</a>
-          <a class="btn btn-ghost btn-lg" href="#plugs">Find a trusted seller</a>
-        </div>
-      </div>
-
-      <!-- 3D parcel: each side shows one step. Drag it to spin. -->
-      <div class="parcel-stage" id="parcelStage" aria-label="Sosick parcel showing the three steps: order it, we pick it, we drop it" role="img">
-        <div class="parcel-orbit" aria-hidden="true"><span class="parcel-rider">🛵</span></div>
-        <div class="parcel" id="parcel" aria-hidden="true">
-          <div class="pf pf-front"><b>1</b><span>You<br>order it</span></div>
-          <div class="pf pf-right"><b>2</b><span>We<br>pick it</span></div>
-          <div class="pf pf-back"><b>3</b><span>We<br>drop it</span></div>
-          <div class="pf pf-left"><img src="assets/logo-wordmark-static.svg" alt="" width="150" height="44"><small>Nairobi</small></div>
-          <div class="pf pf-top"></div>
-          <div class="pf pf-bottom"></div>
-        </div>
-        <div class="parcel-shadow" aria-hidden="true"></div>
-        <p class="parcel-hint" aria-hidden="true">Drag the box ↻</p>
-      </div>
-    </div>
-
-    <!-- The plain-words facts: no guessing what Sosick is -->
-    <div class="wrap">
-      <ul class="facts" aria-label="Sosick in plain words">
-        <li class="fact"><span class="fact-ico" aria-hidden="true">📦</span><b>What we do</b>We buy or collect what you ask for and bring it to you.</li>
-        <li class="fact"><span class="fact-ico" aria-hidden="true">📍</span><b>Where</b>Nairobi and nearby towns. <a href="#areas">See every area</a></li>
-        <li class="fact"><span class="fact-ico" aria-hidden="true">💸</span><b>What it costs</b><span id="factFee">The item's price plus a delivery fee. We tell you the fee on WhatsApp before the rider leaves.</span></li>
-        <li class="fact"><span class="fact-ico" aria-hidden="true">📲</span><b>How you pay</b>M-Pesa or cash when it arrives, after you check it.</li>
-        <li class="fact"><span class="fact-ico" aria-hidden="true">🙅</span><b>No app, no account</b>The order slip opens WhatsApp. That's all you need.</li>
-      </ul>
-    </div>
-
-    <div class="wrap engines">
-      <a class="engine engine-sun" href="#order">
-        <span class="engine-tag">Option 1 · You know what you want</span>
-        <span class="engine-name">Pick Up &amp; Delivery</span>
-        <span class="engine-copy">Tell us what you need and where you are. A Sosick rider picks it up and brings it to you.</span>
-        <span class="engine-go">Place an order →</span>
-      </a>
-      <a class="engine engine-ink" href="#plugs">
-        <span class="engine-tag">Option 2 · You need a seller you can trust</span>
-        <span class="engine-name">Verified Plugs</span>
-        <span class="engine-copy">Need jeans but no plug? Every seller here has been tested by us before getting the badge.</span>
-        <span class="engine-go">Find a plug →</span>
-      </a>
-    </div>
-  </section>
-
-  <!-- HOW IT WORKS on home, as 3D stairs -->
-  <section class="band band-paper band-stairs">
-    <div class="wrap">
-      <p class="eyebrow">How it works</p>
-      <h2 class="h2">Three steps.<br><span class="hl">Zero stress.</span></h2>
-      <ol class="stairs">
-        <li class="stair"><span class="step-n">1</span><h3>You order</h3><p>Fill the order slip (or chat with Sosi). It opens WhatsApp with your order typed out and an order code like <span class="mono">SOS-1234</span>.</p></li>
-        <li class="stair"><span class="step-n">2</span><h3>We pick it</h3><p>We reply on WhatsApp with the price and delivery fee. Once you say yes, a rider collects it.</p></li>
-        <li class="stair"><span class="step-n">3</span><h3>We drop it</h3><p>The rider brings it to you. You check it, then pay with M-Pesa or cash. Follow it live on <a href="#track">Track</a>.</p></li>
-      </ol>
-    </div>
-  </section>
-
-  <div class="ticker" aria-hidden="true"><div class="ticker-track" id="ticker"></div></div>
-
-  <!-- CATEGORIES -->
-  <section class="band band-paper band-cats" id="categories">
-    <div class="wrap">
-      <div class="cats-head">
-        <div>
-          <p class="eyebrow">Categories</p>
-          <h2 class="h2">Shop by<br><span class="hl">category.</span></h2>
-        </div>
-        <p class="lede">Pick a lane. Every category has its own page you can share, with the Verified Plugs for it and a one-tap order.</p>
-      </div>
-      <div class="cat-grid" id="catGrid"></div>
-    </div>
-  </section>
-
-  <!-- FRESH FROM SOSICK: his own products, newest first -->
-  <section class="band band-sun" id="fresh" hidden>
-    <div class="wrap">
-      <div class="cats-head">
-        <div>
-          <p class="eyebrow">Made &amp; stocked by us</p>
-          <h2 class="h2">Fresh from<br><span class="hl">Sosick.</span></h2>
-        </div>
-        <p class="lede" style="color:var(--ink)">Our own pieces, ready to order. Tap Order this and it lands on your order slip.</p>
-      </div>
-      <div class="product-grid" id="freshGrid"></div>
-    </div>
-  </section>
-
-  </div>
-
-  <div class="view view-order" data-view="order">
-  <!-- ORDER -->
-  <section class="band band-paper" id="order">
-    <div class="wrap order-grid">
-      <div class="order-intro">
-        <p class="eyebrow">Pick up &amp; delivery</p>
-        <h2 class="h2">Tell us what<br>you need.</h2>
-        <p class="lede">Fill this in and it opens WhatsApp with your order already written. We confirm, and a rider heads out.</p>
-        <ul class="ticks">
-          <li>Any shop, market stall or Verified Plug</li>
-          <li>Pay with M-Pesa or cash when it arrives</li>
-          <li>You get an order code to follow up with</li>
-        </ul>
-        <p class="note">Rather chat? <button class="linkish" type="button" data-open-sosi="order">Ask Sosi to fill it for you</button>.</p>
-      </div>
-
-      <form class="ticket" id="orderForm" novalidate>
-        <div class="ticket-head">
-          <span>SOSICK ORDER SLIP</span>
-          <span class="mono" id="orderCode">SOS-0000</span>
-        </div>
-
-        <div class="field">
-          <label for="item">What do you need?</label>
-          <textarea id="item" rows="2" placeholder="e.g. Black baggy jeans size 32, or pick my parcel from Easy Coach" required></textarea>
-        </div>
-
-        <div class="field">
-          <label for="pickup">Where do we pick it from? <em class="opt">optional</em></label>
-          <input id="pickup" type="text" list="placesList" placeholder="Shop name, market or area. Leave blank if you want us to find it" autocomplete="off">
-        </div>
-
-        <div class="row2">
-          <div class="field">
-            <label for="dropArea">Deliver to (area or campus)</label>
-            <input id="dropArea" type="text" list="placesList" placeholder="Start typing… e.g. Chiromo" autocomplete="off" required>
-          </div>
-          <div class="field">
-            <label for="landmark">Landmark / directions <em class="opt">optional</em></label>
-            <input id="landmark" type="text" placeholder="e.g. Blue gate opposite Shell, Hall 5">
-          </div>
-        </div>
-        <div class="loc-row">
-          <button type="button" class="btn btn-ghost btn-sm" id="locBtn">📍 Use my location</button>
-          <span class="loc-status" id="locStatus" aria-live="polite"></span>
-        </div>
-        <datalist id="placesList"></datalist>
-
-        <div class="row2">
-          <div class="field">
-            <label for="custName">Your name</label>
-            <input id="custName" type="text" autocomplete="name" placeholder="e.g. Wanjiru" required>
-          </div>
-          <div class="field">
-            <label for="custPhone">Phone number</label>
-            <input id="custPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="07XX XXX XXX" required>
-          </div>
-        </div>
-
-        <fieldset class="field">
-          <legend>When?</legend>
-          <div class="chips" role="radiogroup">
-            <label class="chip"><input type="radio" name="when" value="As soon as possible" checked><span>ASAP</span></label>
-            <label class="chip"><input type="radio" name="when" value="Later today"><span>Later today</span></label>
-            <label class="chip"><input type="radio" name="when" value="Tomorrow"><span>Tomorrow</span></label>
-          </div>
-        </fieldset>
-
-        <fieldset class="field">
-          <legend>Pay with</legend>
-          <div class="chips" role="radiogroup">
-            <label class="chip"><input type="radio" name="pay" value="M-Pesa on delivery" checked><span>M-Pesa on delivery</span></label>
-            <label class="chip"><input type="radio" name="pay" value="Cash on delivery"><span>Cash</span></label>
-          </div>
-        </fieldset>
-
-        <p class="form-error" id="formError" role="alert" hidden></p>
-
-        <div class="ticket-foot">
-          <p class="fee-line" id="feeLine">Delivery fee: <strong>confirmed on WhatsApp</strong> before pickup. No extra charges.</p>
-          <button class="btn btn-ink btn-lg" type="submit">Send order on WhatsApp</button>
-        </div>
-        <p class="next-line"><b>What happens next:</b> WhatsApp opens with your order typed out. Press send there. We reply with the price and fee, and nothing moves until you say yes.</p>
-        <p class="note privacy-note">We only use these details to deliver your order. <a href="privacy.html">How we handle your details</a></p>
-      </form>
-
-      <div class="sent" id="sentCard" hidden>
-        <p class="eyebrow">Order slip ready</p>
-        <h3 class="h3">Almost there! Hit send in WhatsApp.</h3>
-        <pre class="sent-msg mono" id="sentMsg"></pre>
-        <div class="sent-actions">
-          <a class="btn btn-ink" id="sentWa" href="#" target="_blank" rel="noopener">Open WhatsApp again</a>
-          <button class="btn btn-ghost" type="button" id="copyMsg">Copy message</button>
-          <button class="btn btn-ghost" type="button" id="newOrder">New order</button>
-          <a class="btn btn-ghost" href="#track" id="trackThis">🛵 Track this order</a>
-        </div>
-        <p class="note">WhatsApp didn't open? Send the message above to <strong class="mono wa-number">0112 275 881</strong>.</p>
-      </div>
-    </div>
-  </section>
-
-  </div>
-
-  <div class="view view-track" data-view="track">
-  <!-- TRACK -->
-  <section class="band band-track" id="track">
-    <div class="wrap">
-      <div class="track-head">
-        <div>
-          <p class="eyebrow">Track your order</p>
-          <h2 class="h2">Where's my<br><span class="hl">stuff?</span></h2>
-        </div>
-        <p class="lede">Type your order code and the last 4 digits of the phone you ordered with. Watch your rider move in real time.</p>
-      </div>
-
-      <form class="track-form" id="trackForm" novalidate>
-        <div class="field">
-          <label for="tCode">Order code</label>
-          <input id="tCode" type="text" placeholder="SOS-1234" autocomplete="off" autocapitalize="characters" maxlength="8">
-        </div>
-        <div class="field">
-          <label for="tPhone">Last 4 phone digits</label>
-          <input id="tPhone" type="text" inputmode="numeric" placeholder="e.g. 5678" maxlength="4" autocomplete="off">
-        </div>
-        <button class="btn btn-ink btn-lg" type="submit" id="tBtn">Track it</button>
-      </form>
-      <p class="form-error" id="tError" role="alert" hidden></p>
-
-      <div class="tracker" id="tracker" hidden aria-live="polite">
-        <div class="tracker-top">
-          <span class="mono" id="trCode">SOS-0000</span>
-          <span class="tracker-area" id="trArea"></span>
-        </div>
-        <p class="tracker-status" id="trStatus">ON THE WAY</p>
-        <div class="road" id="trRoad">
-          <div class="road-fill" id="trFill"></div>
-          <span class="rider" id="trRider" aria-hidden="true">🛵</span>
-          <ol class="stops">
-            <li data-stop="new"><b>Received</b><small></small></li>
-            <li data-stop="picked"><b>Picked up</b><small></small></li>
-            <li data-stop="way"><b>On the way</b><small></small></li>
-            <li data-stop="done"><b>Delivered</b><small></small></li>
-          </ol>
-        </div>
-        <p class="tracker-note" id="trNote"></p>
-      </div>
-    </div>
-  </section>
-
-  </div>
-
-  <div class="view view-plugs" data-view="plugs">
-  <!-- VERIFIED PLUGS -->
-  <section class="band band-ink" id="plugs">
-    <div class="wrap">
-      <div class="plugs-head">
-        <div>
-          <p class="eyebrow eyebrow-sun">Verified Plugs</p>
-          <h2 class="h2">No plug?<br><span class="hl-ink">We've got one.</span></h2>
-        </div>
-        <p class="lede">Every seller here passed the <strong>Sosick Test</strong>. We bought from them ourselves before giving them the badge. If they slip, they lose it.</p>
-      </div>
-
-      <div class="plug-tools">
-        <label class="sr-only" for="plugSearch">Search plugs</label>
-        <input class="search" id="plugSearch" type="search" placeholder="What are you hunting? jeans, sneakers, perfume…">
-        <div class="cat-chips" id="catChips"></div>
-      </div>
-
-      <div class="plug-grid" id="plugGrid"></div>
-
-      <div class="test">
-        <h3 class="h3">The Sosick Test</h3>
-        <p class="test-sub">A seller only goes live after passing all five checks:</p>
-        <ul class="test-list">
-          <li><b>Mystery buy</b>We order from them as a normal customer.</li>
-          <li><b>Photo = product</b>What arrives matches what they posted.</li>
-          <li><b>Honest price</b>No hidden charges and no price that changes after you pay.</li>
-          <li><b>On time</b>They deliver or hand over when they said they would.</li>
-          <li><b>Sorts issues</b>They fix problems and handle returns properly.</li>
-        </ul>
-        <div class="badges">
-          <span class="badge badge-verified">✓ Verified</span><span class="badge-desc">Passed the test</span>
-          <span class="badge badge-trusted">★ Trusted</span><span class="badge-desc">3+ months, no complaints</span>
-          <span class="badge badge-top">♛ Top Plug</span><span class="badge-desc">Comrades' favourite</span>
-        </div>
-      </div>
-
-      <div class="plug-ctas">
-        <a class="btn btn-sun wa-link" data-wa="Hi Sosick! I sell stuff and I'd like you to test my shop for the Verified badge. My shop name:" href="#" target="_blank" rel="noopener">I'm a seller: test my shop</a>
-        <a class="btn btn-outline-sun wa-link" data-wa="Hi Sosick! I know a solid plug you should test. Their name / page:" href="#" target="_blank" rel="noopener">Nominate a plug</a>
-      </div>
-    </div>
-  </section>
-
-  </div>
-
-  <div class="view view-info" data-view="info">
-  <span id="info"></span>
-  <!-- HOW IT WORKS: a real sequence, so it is numbered -->
-  <section class="band band-sun" id="how">
-    <div class="wrap">
-      <p class="eyebrow">How it works</p>
-      <h2 class="h2">Three steps. Zero stress.</h2>
-      <ol class="steps">
-        <li><span class="step-n">1</span><h3>You order</h3><p>Fill the slip or chat with Sosi. It lands on our WhatsApp with your order code.</p></li>
-        <li><span class="step-n">2</span><h3>We pick it</h3><p>We confirm the price with you, then a rider collects it from the shop, stall or plug.</p></li>
-        <li><span class="step-n">3</span><h3>We drop it</h3><p>Delivered to your gate, hostel or desk. You check it, then pay.</p></li>
-      </ol>
-    </div>
-  </section>
-
-  <!-- AREAS -->
-  <section class="band band-paper" id="areas">
-    <div class="wrap">
-      <p class="eyebrow">Where we deliver</p>
-      <h2 class="h2">Nairobi first.<br>Kenya next.</h2>
-      <p class="lede">We're launching in Nairobi and nearby towns. Not on the list? Order anyway and we'll tell you if a rider can reach you.</p>
-      <h3 class="h4 route-sign"><b>Route 1</b> Campuses</h3>
-      <ul class="pill-list" id="campusList"></ul>
-      <h3 class="h4 route-sign"><b>Route 2</b> Areas</h3>
-      <ul class="pill-list" id="areaList"></ul>
-      <h3 class="h4 route-sign route-sign-soon"><b>Soon</b> Coming next</h3>
-      <ul class="pill-list pill-list-soon" id="nextList"></ul>
-    </div>
-  </section>
-
-  <!-- STRAIGHT ANSWERS -->
-  <section class="band band-ink" id="faq">
-    <div class="wrap">
-      <p class="eyebrow eyebrow-sun">Straight answers</p>
-      <h2 class="h2">Questions?<br><span class="hl-ink">Asked &amp; answered.</span></h2>
-      <div class="faq">
-        <details open><summary>What can I order?</summary><p>Anything you can buy or collect in Nairobi: clothes and shoes from a shop or market stall, a parcel from a bus office, or something from one of our Verified Plugs. Not sure? Ask on WhatsApp.</p></details>
-        <details><summary>How much is delivery?</summary><p id="faqFee">You pay the item's price plus a delivery fee. We tell you the exact fee on WhatsApp <strong>before</strong> the rider leaves, so there are no surprises.</p></details>
-        <details><summary>When do I pay, and how?</summary><p>When it arrives. Check it first, then pay with M-Pesa or cash.</p></details>
-        <details><summary>Do I need an app or an account?</summary><p>No. Fill the order slip and it opens WhatsApp with everything typed out. Or just text <span class="mono wa-number">0112 275 881</span>.</p></details>
-        <details><summary>Do you deliver to my area?</summary><p>Check the route lists above. Not on them? Order anyway and we'll tell you honestly if a rider can reach you.</p></details>
-        <details><summary>What is a Verified Plug?</summary><p>A seller who passed all five checks of the Sosick Test: we bought from them ourselves first. If they slip, they lose the badge. <a href="#plugs">See the plugs</a></p></details>
-        <details><summary>How do I follow my order?</summary><p>Open <a href="#track">Track</a> and type your order code (like SOS-1234) and the last 4 digits of the phone you ordered with.</p></details>
-        <details><summary>What do you do with my details?</summary><p>We only use them to deliver your order. <a href="privacy.html">Read how we handle your details</a>.</p></details>
-      </div>
-    </div>
-  </section>
-
-  </div>
-
-</main>
-
-<footer class="footer">
-  <div class="wrap footer-in">
-    <div>
-      <img class="footer-mark" src="assets/logo-wordmark-static.svg" alt="Sosick" width="190" height="56">
-      <p>Pick up, delivery and Verified Plugs in Nairobi.</p>
-    </div>
-    <div>
-      <p class="footer-label">WhatsApp</p>
-      <p class="mono footer-num wa-number">0112 275 881</p>
-      <a class="btn btn-sun btn-sm wa-link" data-wa="Hi Sosick 👋" href="#" target="_blank" rel="noopener">Chat on WhatsApp</a>
-    </div>
-  </div>
-  <div class="wrap footer-fine">© <span id="year">2026</span> Sosick · Nairobi, Kenya · <a href="privacy.html">Privacy</a></div>
-</footer>
-
-<!-- TAB BAR (phones): one tap per screen -->
-<nav class="tabbar" aria-label="Screens">
-  <a href="#top" data-nav="home"><span aria-hidden="true">🏠</span>Home</a>
-  <a href="#order" data-nav="order"><span aria-hidden="true">🛵</span>Order</a>
-  <a href="#track" data-nav="track"><span aria-hidden="true">📍</span>Track</a>
-  <a href="#plugs" data-nav="plugs"><span aria-hidden="true">🔌</span>Plugs</a>
-  <a href="#info" data-nav="info"><span aria-hidden="true">📖</span>Info</a>
+<nav aria-label="Route stops">
+  <ol class="rail" id="rail">
+    <li><a href="#start"><span>Start</span></a></li>
+    <li><a href="#shop"><span>Shop Sosick</span></a></li>
+    <li><a href="#categories"><span>Categories</span></a></li>
+    <li><a href="#plugs"><span>Verified Plugs</span></a></li>
+    <li><a href="#sell"><span>Sell with us</span></a></li>
+    <li><a href="#get-it"><span>Get it</span></a></li>
+    <li><a href="#go"><span>Sosick shop</span></a></li>
+  </ol>
 </nav>
 
-<!-- SOSI: the chat helper -->
+<main>
+  <section class="chap hero" id="start" data-t="0">
+    <div class="chap-in">
+      <h1>Thrift it. Trust it. <em>Get it.</em></h1>
+      <p><b>Sosick is a thrift shop and a market of sellers we've tested.</b> Shop our own thrift shoes, clothes, beads and accessories, or buy from Verified Plugs. We pick it up and bring it to you, and you pay when it arrives.</p>
+      <div class="ctas">
+        <a class="btn btn-sun" href="#shop">Walk the street ↓</a>
+        <a class="btn btn-line" href="https://wa.me/254112275881?text=Hi%20Sosick!%20I'm%20looking%20for%3A%20" target="_blank" rel="noopener">Ask on WhatsApp</a>
+      </div>
+      <ul class="chips" aria-label="Quick facts">
+        <li>Our own thrift &amp; beads</li><li>Tested sellers only</li><li>Pay on arrival</li><li>Nairobi</li>
+      </ul>
+      <p class="drag-note" aria-hidden="true">Scroll to walk the street · the rider follows you</p>
+    </div>
+  </section>
+
+  <section class="chap" id="shop" data-t="0.17">
+    <div class="chap-in">
+      <article class="stop">
+        <div class="plate"><span>Stop 1</span><span>Shop Sosick</span></div>
+        <div class="stop-body">
+          <h2>Our own pieces.</h2>
+          <p>Thrift shoes and clothes we pick ourselves, and <strong>beads we make by hand</strong>. Each piece shows with its photo and price, or "Ask for price". Tap <strong>Order this</strong> and it lands on your order slip.</p>
+          <ul class="cats" aria-label="On the rails">
+            <li><i style="background:#FF5A36"></i>Thrift shoes</li><li><i style="background:#3B6FE0"></i>Thrift clothes</li><li><i style="background:#FFD21F"></i>Beads</li><li><i style="background:#8B5CF6"></i>Accessories</li>
+          </ul>
+          
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="chap" id="categories" data-t="0.37">
+    <div class="chap-in">
+      <article class="stop right">
+        <div class="plate"><span>Stop 2</span><span>Categories</span></div>
+        <div class="stop-body">
+          <h2>A stall for every lane.</h2>
+          <p>Each category is its own stall with its own page: our pieces in that lane, the Verified Plugs who sell it, and a one-tap order.</p>
+          <ul class="cats" aria-label="Categories at launch">
+            <li><i style="background:#FF5A36"></i>Shoes</li><li><i style="background:#3B6FE0"></i>Clothes</li><li><i style="background:#FFD21F"></i>Beads</li><li><i style="background:#8B5CF6"></i>Accessories</li>
+          </ul>
+          <p><strong>More stalls open as Sosick grows.</strong> New categories are added from the admin, no code needed.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="chap" id="plugs" data-t="0.57">
+    <div class="chap-in">
+      <article class="stop">
+        <div class="plate"><span>Stop 3</span><span>Verified Plugs</span></div>
+        <div class="stop-body">
+          <h2>Sellers we've bought from ourselves.</h2>
+          <p>A <strong>Verified Plug</strong> is a seller outside Sosick, like an online thrift page or a market stall, that we tested by secretly buying from them first. They only get a stall here if every check passes.</p>
+          <ol class="checks">
+            <li><span><b>We buy in secret</b>, like any normal customer.</span></li>
+            <li><span><b>The item matches the photos.</b></span></li>
+            <li><span><b>The price is honest</b>: no hidden costs, no changes after you pay.</span></li>
+            <li><span><b>They're on time.</b></span></li>
+            <li><span><b>They fix problems</b> and handle returns properly.</span></li>
+          </ol>
+          <ul class="tiers" aria-label="Badge levels">
+            <li><b>✓ Verified</b>Passed all 5 checks</li>
+            <li><b>★ Trusted</b>3+ months, no complaints</li>
+            <li><b>♛ Top Plug</b>The comrades' favourite</li>
+          </ul>
+          <p><strong>How you buy:</strong> pick something from a plug, tell Sosick, and we collect it from them and bring it to you. You check it before you pay. If a plug lets buyers down, they lose the badge.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="chap" id="sell" data-t="0.76">
+    <div class="chap-in">
+      <article class="stop right">
+        <div class="plate"><span>Stop 4</span><span>Sell with Sosick</span></div>
+        <div class="stop-body">
+          <h2>Got a shop? Get tested.</h2>
+          <ol class="checks">
+            <li><span><b>Apply</b> on WhatsApp with your shop name and page.</span></li>
+            <li><span><b>Pass the Sosick Test</b> and get your Verified stall.</span></li>
+            <li><span><b>Get seen.</b> Your pieces show in their category, and Sosi sends buyers your way.</span></li>
+            <li><span><b>Want more eyes?</b> Book a featured spot. It's always labelled "Featured".</span></li>
+          </ol>
+          <p><strong>The badge is earned, never bought.</strong></p>
+          <div class="ctas"><a class="btn btn-sun btn-sm" href="https://wa.me/254112275881?text=Hi%20Sosick!%20I%20sell%20stuff%20and%20I'd%20like%20you%20to%20test%20my%20shop.%20My%20shop%20name%3A%20" target="_blank" rel="noopener">Test my shop</a></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="chap" id="get-it" data-t="0.9">
+    <div class="chap-in">
+      <article class="stop">
+        <div class="plate"><span>Stop 5</span><span>Get it</span></div>
+        <div class="stop-body">
+          <h2>We bring it. You check it. Then pay.</h2>
+          <p>Whether it's our piece or a plug's, a Sosick rider picks it up and brings it to your gate, hostel or office. <strong>Check it first, then pay with M-Pesa or cash.</strong> The delivery fee is told to you on WhatsApp before the rider leaves.</p>
+          <ul class="places" aria-label="Some campuses we reach">
+            <li>UoN Chiromo</li><li>KU</li><li>JKUAT Juja</li><li>Strathmore</li><li>USIU-Africa</li><li>+ 55 areas</li>
+          </ul>
+          <div class="ctas"><a class="btn btn-sun btn-sm" href="shop.html#track">Track an order</a></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="chap end" id="go" data-t="1">
+    <div class="chap-in">
+      <article class="stop right">
+        <div class="plate"><span>Last stop</span><span>Sosick</span></div>
+        <div class="stop-body">
+          <h2>Every street ends at Sosick.</h2>
+          <p>Our own thrift and beads, sellers we've tested, and a rider to bring it all to you. Looking for something? Text Sosick on WhatsApp, or ask Sosi right here.</p>
+          <p class="num">0112 275 881</p>
+          <div class="ctas">
+            <a class="btn btn-sun" href="https://wa.me/254112275881?text=Hi%20Sosick!%20I%20want%20to%20order%3A%20" target="_blank" rel="noopener">Order on WhatsApp</a>
+            <button class="btn btn-line" type="button" data-open-sosi>Ask Sosi</button>
+          </div>
+          <p class="foot"><a href="shop.html">Order slip, tracking &amp; plugs</a> · <a href="outfit.html">Outfit Match</a> · <a href="privacy.html">Privacy</a> · © <span id="yr">2026</span> Sosick, Nairobi</p>
+        </div>
+      </article>
+    </div>
+  </section>
+</main>
+
 <button class="sosi-fab" id="sosiFab" type="button" aria-label="Chat with Sosi, the Sosick helper" aria-expanded="false" aria-controls="sosiPanel">
-  <span class="sosi-bubble" id="sosiNudge">Niaje! Need something? 👀</span>
+  <span class="sosi-bubble" id="sosiNudge">Niaje! I'm Sosi. Unatafuta nini? 👀</span>
   <span class="sosi-face" aria-hidden="true"><i class="eye"></i><i class="eye"></i><i class="mouth"></i></span>
 </button>
-
 <section class="sosi-panel" id="sosiPanel" role="dialog" aria-label="Sosi chat" hidden>
   <header class="sosi-top">
     <span class="sosi-face sosi-face-sm" aria-hidden="true"><i class="eye"></i><i class="eye"></i><i class="mouth"></i></span>
-    <div class="sosi-id">
-      <strong>Sosi</strong>
-      <small id="sosiMood">Sosick's helper bot · online</small>
-    </div>
-    <button class="sosi-toggle" id="shengToggle" type="button" aria-pressed="true" title="Switch between Sheng and plain English">Sheng: ON</button>
+    <div class="sosi-id"><strong>Sosi</strong><small id="sosiMood">Sosick's helper · online</small></div>
+    <button class="sosi-toggle" id="shengToggle" type="button" aria-pressed="true">Sheng: ON</button>
     <button class="sosi-x" id="sosiClose" type="button" aria-label="Close chat">×</button>
   </header>
   <div class="sosi-log" id="sosiLog" aria-live="polite"></div>
   <div class="sosi-chips" id="sosiChips"></div>
   <form class="sosi-input" id="sosiForm">
-    <label class="sr-only" for="sosiText">Message Sosi</label>
-    <input id="sosiText" type="text" autocomplete="off" placeholder="Type here… e.g. where can I get jeans?">
+    <label class="sr-only" for="sosiText" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Message Sosi</label>
+    <input id="sosiText" type="text" autocomplete="off" placeholder="e.g. where can I get jeans?">
     <button type="submit" aria-label="Send">➤</button>
   </form>
 </section>
 
-<!-- Back to top + toast injection -->
-<button id="backToTop" aria-label="Back to top" title="Back to top">↑</button>
-<div id="toastStack" aria-live="polite" aria-atomic="false"></div>
+<script>
+/* Sosi: rule-based helper, same personality as the live site (no paid AI). */
+(function () {
+  "use strict";
+  var WA = "254112275881";
+  var AREAS = ["CBD","Westlands","Parklands","Ngara","Pangani","Eastleigh","Kilimani","Kileleshwa","Lavington","Hurlingham","Upper Hill","Ngong Road","Karen","Lang'ata","Madaraka","Nairobi West","South B","South C","Kibera","Kawangware","Kangemi","Dagoretti","Riruta","Embakasi","Donholm","Buruburu","Umoja","Kayole","Pipeline","Fedha","Utawala","Roysambu","Kasarani","Zimmerman","Githurai","Kahawa","Mwiki","Thome","Muthaiga","Gigiri","Runda","Ruaka","Kitisuru","Spring Valley","Loresho","Gikomba","Kariobangi","Huruma","Mathare","Ruaraka","Rongai","Kitengela","Syokimau","Ruiru","Juja"];
+  var CAMPUSES = ["UoN Main Campus","UoN Chiromo","Kenyatta University (KU)","JKUAT Juja","Strathmore","USIU-Africa","Daystar Valley Road","TU-K","MMU Rongai","CUEA Lang'ata","KCA University","Zetech Ruiru","Multimedia Uni","KMTC Nairobi"];
+  var ALIAS = { "ku": "Kenyatta University (KU)", "kenyatta": "Kenyatta University (KU)", "jkuat": "JKUAT Juja", "chiromo": "UoN Chiromo", "uon": "UoN Main Campus", "strath": "Strathmore", "usiu": "USIU-Africa", "daystar": "Daystar Valley Road", "tuk": "TU-K", "mmu": "MMU Rongai", "cuea": "CUEA Lang'ata", "kca": "KCA University", "zetech": "Zetech Ruiru", "kmtc": "KMTC Nairobi", "town": "CBD", "langata": "Lang'ata" };
+  var SOON = ["Mombasa","Kisumu","Nakuru","Eldoret","Thika","Machakos"];
+  var CATS = [
+    { id: "shoes", label: "Thrift shoes", words: ["sneakers","shoes","kicks","sneaker","airforce","af1","jordans","boots","sandals","viatu"] },
+    { id: "clothes", label: "Thrift clothes", words: ["jeans","denim","trouser","trousers","tshirt","t-shirt","tee","shirt","hoodie","sweater","top","tops","jacket","jackets","dress","dresses","skirt","clothes","nguo","mtumba","thrift"] },
+    { id: "beads", label: "Beads", words: ["beads","bead","beaded","bracelet","bracelets","necklace","necklaces","anklet","shanga"] },
+    { id: "accessories", label: "Accessories", words: ["bag","bags","handbag","backpack","cap","caps","belt","watch","jewellery","jewelry","earrings","chain","chains"] }
+  ];
+  var $ = function (id) { return document.getElementById(id); };
+  var fab = $("sosiFab"), panel = $("sosiPanel"), log = $("sosiLog"), chipsEl = $("sosiChips"), nudge = $("sosiNudge");
+  var faces = document.querySelectorAll(".sosi-face");
+  var sheng = true, opened = false, state = { mode: null, order: {} };
+  function t(plain, sh) { return sheng ? sh : plain; }
+  function esc(x) { return String(x).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function wa(text) { return "https://wa.me/" + WA + "?text=" + encodeURIComponent(text); }
+  function btn(label, href) { return '<br><a class="msg-btn" href="' + esc(href) + '" target="_blank" rel="noopener">' + esc(label) + "</a>"; }
+  function has(low, words) { return words.some(function (w) { return new RegExp("(^|[^a-z])" + w + "([^a-z]|$)").test(low); }); }
+  function bubble(html, who) { var d = document.createElement("div"); d.className = "msg " + (who === "me" ? "msg-me" : "msg-bot"); d.innerHTML = html; log.appendChild(d); log.scrollTop = log.scrollHeight; return d; }
+  function mood(m) { faces.forEach(function (f) { f.classList.toggle("is-thinking", m === "thinking"); }); $("sosiMood").textContent = m === "thinking" ? t("typing…", "inapiga hesabu…") : "Sosick's helper · online"; }
+  var queue = Promise.resolve();
+  function bot(html, chips) {
+    queue = queue.then(function () { return new Promise(function (res) {
+      mood("thinking"); var ty = bubble("<i></i><i></i><i></i>"); ty.classList.add("msg-typing");
+      setTimeout(function () { ty.remove(); bubble(html); mood("idle"); if (chips) setChips(chips); res(); }, Math.min(1200, 350 + html.replace(/<[^>]+>/g, "").length * 7));
+    }); });
+  }
+  function setChips(list) { chipsEl.innerHTML = ""; list.forEach(function (c) { var b = document.createElement("button"); b.type = "button"; b.textContent = c; b.onclick = function () { say(c); }; chipsEl.appendChild(b); }); }
+  var MAIN = ["🛍️ What do you sell?", "🔌 Find a plug", "🏪 I sell stuff", "🛵 Order something", "📍 Do you deliver to me?", "💸 Charges?", "🙋 Talk to a human"];
+  function findPlace(low) {
+    for (var k in ALIAS) if (new RegExp("(^|[^a-z])" + k + "([^a-z]|$)").test(low)) return ALIAS[k];
+    var all = CAMPUSES.concat(AREAS);
+    for (var i = 0; i < all.length; i++) { var n = all[i].toLowerCase().replace(/\s*\(.*\)/, ""); if (low.indexOf(n) > -1) return all[i]; }
+    return null;
+  }
+  function findSoon(low) { for (var i = 0; i < SOON.length; i++) if (low.indexOf(SOON[i].toLowerCase()) > -1) return SOON[i]; return null; }
+  function findCat(low) { for (var i = 0; i < CATS.length; i++) if (has(low, CATS[i].words)) return CATS[i]; return null; }
 
-<script src="assets/views.js?v=202611151200"></script>
-<script src="assets/data.js?v=202611151200"></script>
-<script src="assets/cats.js?v=202611151200"></script>
-<script src="assets/app.js?v=202611151200"></script>
-<script src="assets/sosi.js?v=202611151200"></script>
-<script src="assets/fancy.js?v=202611151200"></script>
-<script src="assets/depth.js?v=202611151200"></script>
+  function say(raw) {
+    var text = String(raw || "").trim(); if (!text) return;
+    bubble(esc(text), "me"); chipsEl.innerHTML = "";
+    var low = text.toLowerCase();
+    if (state.mode === "order") return orderTurn(text, low);
+    var place = findPlace(low), soon = findSoon(low), cat = findCat(low);
+    if (has(low, ["hi","hello","hey","niaje","sasa","mambo","vipi","yo","sup","habari"]) && low.length < 22)
+      return bot(t("Hey! I'm Sosi, Sosick's shopping-bag helper. What can I get you?", "Niaje niaje! 👋 Mimi ni Sosi, the bag that knows every plug. Unataka nini leo?"), MAIN);
+    if (has(low, ["charge","charges","fee","fees","price","cost","how much","pesa","bei","ngapi"]) || /charges\?/.test(low))
+      return bot(t("You pay the item's price plus a delivery fee. We tell you the exact fee on WhatsApp <b>before</b> the rider leaves, and there are no extra charges at launch. You pay when it arrives, M-Pesa or cash.",
+        "Unalipa bei ya kitu plus delivery fee. Tunakuambia fee exact kwa WhatsApp <b>kabla</b> rider ahame, na hakuna extra charges sahii. Unalipa ikifika, M-Pesa ama cash. 💸"), MAIN);
+    if (/order something|^order|deliver me|bring|letea|nileteeni|buy for me|pick up/.test(low) && !/do you deliver/.test(low)) return startOrder();
+    if (/do you deliver|deliver to|mnafika|you reach/.test(low) || place || soon) return checkArea(place, soon, /do you deliver/.test(low) && !place && !soon);
+    if (/find a plug|plug|where can i (get|find|buy)|natafuta|looking for|who sells/.test(low) || cat) return findPlug(cat);
+    if (/what do you sell|your products|your own|sosick (sells|products)|mnauza nini|bidhaa/.test(low))
+      return bot(t("Sosick sells its own pieces: <b>thrift shoes, thrift clothes, handmade beads and accessories</b>. Plus Verified Plugs, sellers we've tested. Tell me what you're hunting!",
+        "Sosick inauza vitu zake: <b>viatu za thrift, nguo za thrift, shanga za mkono na accessories</b>. Pia kuna Verified Plugs, sellers tumetest. Unatafuta nini? 🛍️"), ["Shoes", "Beads", "Hoodie", "Bag"]);
+    if (/i sell|my shop|seller|advert|advertise|featured|list my|biashara|get tested/.test(low))
+      return bot(t("Love that! Send us your shop name and page. Pass the <b>Sosick Test</b> (5 checks) and you get a Verified stall. Want more eyes? You can book a featured spot, always labelled \"Featured\". The badge itself is never for sale.",
+        "Boss wa biashara! 😎 Tuma shop name na page yako. Ukipita <b>Sosick Test</b> (checks 5) unapata Verified stall. Unataka watu wengi wakuone? Unaweza book featured spot, inaandikwa \"Featured\" wazi. Badge yenyewe hainunuliwi.")
+        + btn("Test my shop", wa("Hi Sosick! I sell stuff and I'd like you to test my shop. My shop name: ")), ["🔌 Find a plug", "✅ What's verified?"]);
+    if (has(low, ["verified","verify","trust","legit","scam","test","badge"]) || /what's verified/.test(low))
+      return bot(t("Every Verified Plug passed the <b>Sosick Test</b>: a mystery buy, photo = product, honest price, on time, and sorting issues properly. Fail one check and there's no badge.",
+        "Kila Verified Plug amepita <b>Sosick Test</b>: tunanunua kwa siri, picha = kitu, bei honest, on time, na wanasort issues. Ukifeli moja? Hakuna badge. Simple. ✅"), ["🔌 Find a plug", "🛵 Order something"]);
+    if (has(low, ["track","status","iko wapi","late"]) || /where is my/.test(low))
+      return bot(t("To follow your rider you need your order code (like SOS-1234) and the last 4 digits of your phone.", "Twende tumtafute rider wako! 🛵 Unahitaji order code (kama SOS-1234) na digits 4 za mwisho za simu yako.") + btn("Open the tracker", "shop.html#track"), MAIN);
+    if (has(low, ["human","person","agent","boss","call","contact","number","whatsapp"]) || /talk to a human/.test(low))
+      return bot(t("The Sosick team is on WhatsApp at <b>0112 275 881</b>.", "Team ya Sosick iko WhatsApp: <b>0112 275 881</b>. Watakushugulikia. 🙋") + btn("Chat with the team", wa("Hi Sosick 👋")), MAIN);
+    if (/who are you|what are you|are you (a )?(bot|ai|robot|human)|wewe ni nani/.test(low))
+      return bot(t("I'm Sosi, Sosick's helper bot: a friendly bag of rules, not a person. For real humans, the team is one tap away.", "Mimi ni Sosi, helper bot wa Sosick. Sio mtu, ni bag yenye akili kidogo 😅 Ukitaka mtu halisi, team iko WhatsApp."), MAIN);
+    if (has(low, ["thanks","thank","asante","poa","nice","cool"])) return bot(t("Anytime! 💛", "Kama kawa! 💛"), MAIN);
+    bot(t("Hmm, I didn't catch that. Try one of these:", "Eish, hiyo imenipita kidogo 🙈 Jaribu moja ya hizi:"), MAIN);
+  }
+  function checkArea(place, soon, ask) {
+    if (ask) return bot(t("Tell me your area or campus, e.g. Rongai or KU.", "Niambie area ama campus yako, kama Rongai ama KU. 📍"), ["UoN Chiromo", "KU", "Westlands", "Rongai"]);
+    if (place) return bot(t("Yes! We deliver to <b>" + esc(place) + "</b>. 🛵", "Ndio! Tunafika <b>" + esc(place) + "</b> bila stress. 🛵"), ["🛵 Order something", "💸 Charges?"]);
+    if (soon) return bot(t(esc(soon) + " is on our <b>coming next</b> list. Not yet, but soon!", esc(soon) + " iko kwa list ya <b>coming next</b>. Bado, lakini inakuja! 🔜"), MAIN);
+    bot(t("That's not on my list yet. Order anyway and we'll tell you honestly if a rider can reach you.", "Hiyo sijaiona kwa list. Order tu, tutakuambia ukweli kama rider anaweza fika."), ["🛵 Order something"]);
+  }
+  function findPlug(cat) {
+    if (!cat) return bot(t("What are you hunting? Jeans, sneakers, perfume…", "Unatafuta nini? Jeans, sneakers, perfume…? 👀"), ["Shoes", "Clothes", "Beads", "Bag"]);
+    bot(t("<b>" + esc(cat.label) + "</b>: check Sosick's own pieces and the Verified Plugs in that stall. Not there yet? We'll hunt it for you and deliver.",
+      "<b>" + esc(cat.label) + "</b>? Angalia vitu za Sosick na Verified Plugs kwa hiyo stall. Haiko? Tutakuhuntia na tukuletee. 🔌")
+      + btn("Hunt it for me", wa("Hi Sosick! I'm looking for " + cat.label.toLowerCase() + ". I want: ")), ["🛍️ What do you sell?", "🛵 Order something"]);
+  }
+  function startOrder() { state.mode = "order"; state.order = { code: "SOS-" + (1000 + Math.floor(Math.random() * 9000)) }; askNext(); }
+  function askNext() {
+    var o = state.order;
+    if (!o.item) return bot(t("Let's go! 🛵 What do you need us to get?", "Twende kazi! 🛵 Tukuletee nini? Andika kama <i>black jeans size 32</i>"), ["Cancel"]);
+    if (!o.drop) return bot(t("Where should we drop it? Area or campus works.", "Tukuletee wapi? Area ama campus inatosha."), ["UoN Chiromo", "KU", "Westlands", "Rongai", "Cancel"]);
+    if (!o.name) return bot(t("And your name?", "Na jina lako boss?"), ["Cancel"]);
+    finish();
+  }
+  function orderTurn(text, low) {
+    if (/^cancel$|^stop$/.test(low)) { state.mode = null; return bot(t("Cancelled. What next?", "Poa, tumeachana na hiyo. Tufanye nini sasa?"), MAIN); }
+    var o = state.order;
+    if (!o.item) o.item = text; else if (!o.drop) o.drop = findPlace(low) || text; else if (!o.name) o.name = text;
+    askNext();
+  }
+  function finish() {
+    var o = state.order; state.mode = null;
+    var msg = "Hi Sosick! New order " + o.code + "\nItem: " + o.item + "\nDeliver to: " + o.drop + "\nName: " + o.name + "\nPay: M-Pesa on delivery";
+    bot(t("Order slip ready! <b>" + esc(o.code) + "</b>: " + esc(o.item) + " to " + esc(o.drop) + ". Tap below and press send in WhatsApp. We'll reply with the price and fee.",
+      "Slip iko ready! <b>" + esc(o.code) + "</b>: " + esc(o.item) + " kwenda " + esc(o.drop) + ". Bonyeza hapa chini, kisha send kwa WhatsApp. Tutakurudishia bei na fee. ✅")
+      + btn("Send on WhatsApp", wa(msg)), MAIN);
+  }
+  function open() {
+    panel.hidden = false; fab.hidden = true; fab.setAttribute("aria-expanded", "true");
+    if (!opened) { opened = true; bot(t("Hey! I'm Sosi, Sosick's helper. I can start an order, find a plug, check your area or explain charges.", "Niaje! 👋 Mimi ni Sosi. Naweza kukuanzishia order, kukutafutia plug, kucheck area yako ama kukueleza charges."), MAIN); }
+    setTimeout(function () { $("sosiText").focus(); }, 50);
+  }
+  function close() { panel.hidden = true; fab.hidden = false; fab.setAttribute("aria-expanded", "false"); fab.focus(); }
+  fab.addEventListener("click", open);
+  $("sosiClose").addEventListener("click", close);
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !panel.hidden) close(); });
+  document.querySelectorAll("[data-open-sosi]").forEach(function (b) { b.addEventListener("click", open); });
+  $("sosiForm").addEventListener("submit", function (e) { e.preventDefault(); var v = $("sosiText").value; $("sosiText").value = ""; say(v); });
+  $("shengToggle").addEventListener("click", function () { sheng = !sheng; this.textContent = "Sheng: " + (sheng ? "ON" : "OFF"); this.setAttribute("aria-pressed", sheng); });
+  // Sosi comments as you ride past each stop
+  var LINES = {
+    "start": ["Niaje! I'm Sosi. Unatafuta nini? 👀", "Hi! I'm Sosi. What are you hunting? 👀"],
+    "shop": ["Hizi ni vitu zetu wenyewe 🛍️", "These are Sosick's own pieces 🛍️"],
+    "categories": ["Chagua stall yako 👟👕📿", "Pick your stall 👟👕📿"],
+    "plugs": ["Hawa plugs wamepita test 5/5 ✅", "These plugs passed all 5 checks ✅"],
+    "sell": ["Uko na shop? Niulize 😎", "Got a shop? Ask me 😎"],
+    "get-it": ["Check kwanza, lipa baadaye 👌", "Check it first, then pay 👌"],
+    "go": ["Karibu Sosick! 🛍️ Nikusaidie?", "Welcome to Sosick! 🛍️ Can I help?"]
+  };
+  var hideT;
+  window.sosiAt = function (id) {
+    var l = LINES[id]; if (!l || !panel.hidden) return;
+    nudge.textContent = sheng ? l[0] : l[1]; nudge.classList.remove("is-hidden");
+    clearTimeout(hideT); hideT = setTimeout(function () { nudge.classList.add("is-hidden"); }, 4500);
+  };
+  hideT = setTimeout(function () { nudge.classList.add("is-hidden"); }, 6000);
+})();
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function () {
+  "use strict";
+  var calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var small = Math.min(innerWidth, innerHeight) < 700;
+  var canvas = document.getElementById("city");
+  var renderer;
+  function fallback() { canvas.remove(); var d = document.createElement("div"); d.className = "fallback-sky"; document.body.prepend(d); }
+  if (!window.THREE) { fallback(); return; }
+  try { renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: !small, powerPreference: "high-performance" }); }
+  catch (e) { fallback(); return; }
+  var lite = small && (navigator.hardwareConcurrency || 4) <= 4;
+  renderer.setPixelRatio(lite ? 1 : Math.min(devicePixelRatio || 1, small ? 1.5 : 1.75));
+  renderer.outputEncoding = THREE.sRGBEncoding;
+
+  var SUN = 0xFFD21F, INK = 0x111110;
+  var scene = new THREE.Scene();
+  scene.fog = new THREE.Fog(0x2a1d0f, 45, small ? 140 : 190);
+  var camera = new THREE.PerspectiveCamera(small ? 62 : 50, innerWidth / innerHeight, 0.1, 400);
+
+  // seeded random so the city is the same every visit
+  var seed = 11; function rnd() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
+
+  function tex(w, h, draw) {
+    var c = document.createElement("canvas"); c.width = w; c.height = h;
+    var g = c.getContext("2d"); draw(g, w, h);
+    var t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; t.anisotropy = 4; return t;
+  }
+  var DISPLAY = '"Dela Gothic One", "Arial Black", Impact, sans-serif', MONO = '"JetBrains Mono", Menlo, monospace', BODY = '"Familjen Grotesk", Arial, sans-serif';
+
+  // sky
+  scene.background = tex(4, 256, function (g, w, h) {
+    var gr = g.createLinearGradient(0, 0, 0, h);
+    gr.addColorStop(0, "#0E0D0B"); gr.addColorStop(0.45, "#2A1D0F"); gr.addColorStop(0.72, "#8A4A12"); gr.addColorStop(1, "#FFB224");
+    g.fillStyle = gr; g.fillRect(0, 0, w, h);
+  });
+
+  scene.add(new THREE.HemisphereLight(0xffd79a, 0x15130f, 0.75));
+  var sunLight = new THREE.DirectionalLight(0xffb45a, 0.9); sunLight.position.set(-60, 40, -120); scene.add(sunLight);
+
+  // ground
+  var ground = new THREE.Mesh(new THREE.PlaneGeometry(800, 800), new THREE.MeshLambertMaterial({ color: 0x17150f }));
+  ground.rotation.x = -Math.PI / 2; scene.add(ground);
+
+  // the route
+  var pts = [[0, 30], [0, -10], [8, -45], [35, -68], [70, -70], [92, -45], [95, -8], [78, 25], [45, 42], [18, 68], [10, 105], [24, 135]];
+  var curve = new THREE.CatmullRomCurve3(pts.map(function (p) { return new THREE.Vector3(p[0], 0, p[1]); }), false, "catmullrom", 0.5);
+  var N = 600, samples = curve.getSpacedPoints(N);
+  var UP = new THREE.Vector3(0, 1, 0);
+  function sideAt(t) { var tg = curve.getTangentAt(t); return new THREE.Vector3(tg.z, 0, -tg.x).normalize(); }
+
+  function ribbon(width, y, color) {
+    var pos = [], idx = [];
+    for (var i = 0; i <= N; i++) {
+      var p = samples[i], s = sideAt(i / N);
+      pos.push(p.x + s.x * width, y, p.z + s.z * width, p.x - s.x * width, y, p.z - s.z * width);
+      if (i < N) { var a = i * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
+    }
+    var geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); geo.setIndex(idx); geo.computeVertexNormals();
+    var m = new THREE.Mesh(geo, new THREE.MeshLambertMaterial({ color: color, side: THREE.DoubleSide })); scene.add(m); return m;
+  }
+  ribbon(6.4, 0.02, 0x2d2a22);  // pavement
+  ribbon(4.4, 0.04, 0x1f1d18);  // tarmac
+
+  // centre line dashes + streetlights
+  var dashGeo = new THREE.BoxGeometry(0.22, 0.02, 1.3), dashMat = new THREE.MeshBasicMaterial({ color: SUN });
+  var dashes = new THREE.InstancedMesh(dashGeo, dashMat, Math.ceil(N / 5));
+  var poleGeo = new THREE.CylinderGeometry(0.09, 0.12, 5, 6), poleMat = new THREE.MeshLambertMaterial({ color: 0x3a372d });
+  var bulbGeo = new THREE.SphereGeometry(0.32, 10, 8), bulbMat = new THREE.MeshBasicMaterial({ color: 0xffe08a });
+  var glowTex = tex(64, 64, function (g) { var r = g.createRadialGradient(32, 32, 0, 32, 32, 32); r.addColorStop(0, "rgba(255,200,80,.85)"); r.addColorStop(1, "rgba(255,200,80,0)"); g.fillStyle = r; g.fillRect(0, 0, 64, 64); });
+  var glowMat = new THREE.MeshBasicMaterial({ map: glowTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
+  var lampCount = Math.ceil(N / 24);
+  var poles = new THREE.InstancedMesh(poleGeo, poleMat, lampCount), bulbs = new THREE.InstancedMesh(bulbGeo, bulbMat, lampCount);
+  var glows = new THREE.InstancedMesh(new THREE.PlaneGeometry(7, 7), glowMat, lampCount);
+  var M = new THREE.Matrix4(), Q = new THREE.Quaternion(), S1 = new THREE.Vector3(1, 1, 1), V = new THREE.Vector3();
+  var di = 0, li = 0;
+  for (var i = 0; i < N; i++) {
+    var t = i / N, p = samples[i], tg = curve.getTangentAt(t);
+    if (i % 5 === 0) { Q.setFromAxisAngle(UP, Math.atan2(tg.x, tg.z)); M.compose(V.set(p.x, 0.06, p.z), Q, S1); dashes.setMatrixAt(di++, M); }
+    if (i % 24 === 12) {
+      var sd = sideAt(t).multiplyScalar(li % 2 ? 5.6 : -5.6);
+      M.compose(V.set(p.x + sd.x, 2.5, p.z + sd.z), new THREE.Quaternion(), S1); poles.setMatrixAt(li, M);
+      M.compose(V.set(p.x + sd.x * 0.85, 5.1, p.z + sd.z * 0.85), new THREE.Quaternion(), S1); bulbs.setMatrixAt(li, M);
+      M.compose(V.set(p.x + sd.x * 0.6, 0.07, p.z + sd.z * 0.6), new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 2), S1); glows.setMatrixAt(li, M);
+      li++;
+    }
+  }
+  dashes.count = di; poles.count = li; bulbs.count = li; glows.count = li;
+  scene.add(dashes, poles, bulbs, glows);
+
+  // buildings with lit windows
+  function windows(seedShift) {
+    return tex(64, 64, function (g) {
+      g.fillStyle = "#16150f"; g.fillRect(0, 0, 64, 64);
+      for (var y = 0; y < 4; y++) for (var x = 0; x < 4; x++) {
+        var r = rnd(); g.fillStyle = r < 0.42 ? (r < 0.12 ? "#FFF0B8" : "#FFC83A") : "#2b2920";
+        g.fillRect(x * 16 + 4, y * 16 + 4, 8, 9);
+      }
+    });
+  }
+  var buckets = [{ max: 9, rep: 2 }, { max: 18, rep: 4 }, { max: 99, rep: 7 }].map(function (b) {
+    var t = windows(); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(2, b.rep);
+    b.mat = new THREE.MeshLambertMaterial({ map: t, emissive: 0xffffff, emissiveMap: t, emissiveIntensity: 0.85 });
+    b.list = []; return b;
+  });
+  var END_P = curve.getPointAt(1), END_T = curve.getTangentAt(1);
+  var SHOP_C = END_P.clone().addScaledVector(END_T, 12);
+  var coarse = samples.filter(function (_, i) { return i % 4 === 0; });
+  var step = small ? 11 : 8.5;
+  for (var x = -75; x <= 175; x += step) for (var z = -125; z <= 175; z += step) {
+    var bx = x + (rnd() - 0.5) * 3, bz = z + (rnd() - 0.5) * 3, d = 1e9;
+    for (var k = 0; k < coarse.length; k++) { var dx = coarse[k].x - bx, dz = coarse[k].z - bz; var dd = dx * dx + dz * dz; if (dd < d) d = dd; }
+    d = Math.sqrt(d);
+    if (d < 11.5 || d > 75) continue;
+    if (Math.hypot(bx - SHOP_C.x, bz - SHOP_C.z) < 16) continue;
+    var h = (3 + Math.pow(rnd(), 2) * 24) * (0.55 + Math.min(d, 60) / 60);
+    var b = buckets.find(function (q) { return h <= q.max; });
+    b.list.push([bx, bz, 3.5 + rnd() * 3.5, h, 3.5 + rnd() * 3.5, rnd()]);
+  }
+  var tints = [new THREE.Color(0xffffff), new THREE.Color(0xe8d9b0), new THREE.Color(0xc9b994), new THREE.Color(0xfff0c8)];
+  buckets.forEach(function (b) {
+    if (!b.list.length) return;
+    var im = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), b.mat, b.list.length);
+    b.list.forEach(function (q, i) {
+      M.compose(V.set(q[0], q[3] / 2, q[1]), new THREE.Quaternion().setFromAxisAngle(UP, q[5] * 0.4), new THREE.Vector3(q[2], q[3], q[4]));
+      im.setMatrixAt(i, M); im.setColorAt(i, tints[i % tints.length]);
+    });
+    scene.add(im);
+  });
+
+  // helpers for landmarks
+  function placeAt(t, sign, dist) {
+    var p = curve.getPointAt(t), s = sideAt(t).multiplyScalar(sign);
+    var pos = p.clone().add(s.clone().multiplyScalar(dist));
+    var face = s.clone().negate();                     // look back at the road
+    return { pos: pos, rotY: Math.atan2(face.x, face.z), road: p };
+  }
+  function signTex(w, h, bg, draw) { return tex(w, h, function (g) { g.fillStyle = bg; g.fillRect(0, 0, w, h); draw(g, w, h); }); }
+  function board(texture, w, h) { return new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide, fog: false })); }
+  function box(w, h, d, color, emissive) { return new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshLambertMaterial({ color: color, emissive: emissive || 0 })); }
+  var focus = [];  // [t, worldPos] for the camera to glance at
+  var spinners = [];
+
+  /* ---------- goods: built from real outlines, with fabric texture ---------- */
+  var GOODS = (function () {
+    var cache = {};
+    function grain(key, base, extra) {
+      if (cache[key]) return cache[key];
+      var t = tex(256, 256, function (c, w, h) {
+        c.fillStyle = base; c.fillRect(0, 0, w, h);
+        var img = c.getImageData(0, 0, w, h), d = img.data;
+        for (var i = 0; i < d.length; i += 4) { var n = (rnd() - 0.5) * 26; d[i] += n; d[i + 1] += n; d[i + 2] += n; }
+        c.putImageData(img, 0, 0);
+        if (extra) extra(c, w, h);
+      });
+      t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(2, 2); cache[key] = t; return t;
+    }
+    function weave(c, w, h) { c.globalAlpha = 0.07; c.fillStyle = "#000"; for (var y = 0; y < h; y += 3) c.fillRect(0, y, w, 1); for (var x = 0; x < w; x += 3) c.fillRect(x, 0, 1, h); c.globalAlpha = 1; }
+    function twill(c, w, h) { c.globalAlpha = 0.13; c.strokeStyle = "#dfe8ff"; c.lineWidth = 1.2; for (var i = -h; i < w; i += 5) { c.beginPath(); c.moveTo(i, h); c.lineTo(i + h, 0); c.stroke(); } c.globalAlpha = 1; }
+    var mats = {};
+    function cloth(hex, kind) {
+      var k = hex + kind; if (mats[k]) return mats[k];
+      var css = "#" + new THREE.Color(hex).getHexString();
+      var map = kind === "denim" ? grain("denim" + css, css, twill) : grain("cot" + css, css, weave);
+      return (mats[k] = new THREE.MeshStandardMaterial({ map: map, roughness: kind === "leather" ? 0.5 : 0.95, metalness: 0 }));
+    }
+    var wood = new THREE.MeshStandardMaterial({ color: 0x9a6a3a, roughness: 0.55 });
+    var metal = new THREE.MeshStandardMaterial({ color: 0xc9c6bd, roughness: 0.35, metalness: 0.35 });
+    var white = new THREE.MeshStandardMaterial({ color: 0xf3efe4, roughness: 0.7 });
+    var shadowTex = tex(64, 64, function (g) { var r = g.createRadialGradient(32, 32, 0, 32, 32, 32); r.addColorStop(0, "rgba(0,0,0,.55)"); r.addColorStop(1, "rgba(0,0,0,0)"); g.fillStyle = r; g.fillRect(0, 0, 64, 64); });
+    var shadowMat = new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, depthWrite: false });
+    function contact(w, d) { var m = new THREE.Mesh(new THREE.PlaneGeometry(w, d), shadowMat); m.rotation.x = -Math.PI / 2; m.position.y = 0.02; return m; }
+
+    function extrude(shape, depth, bevel) {
+      var geo = new THREE.ExtrudeGeometry(shape, { depth: depth, bevelEnabled: true, bevelThickness: bevel, bevelSize: bevel, bevelSegments: 2, curveSegments: 10 });
+      geo.translate(0, 0, -depth / 2); return geo;
+    }
+    // soft folds so cloth doesn't look like cardboard
+    function drape(geo, amt) {
+      var p = geo.attributes.position;
+      for (var i = 0; i < p.count; i++) { var x = p.getX(i), y = p.getY(i);
+        p.setZ(i, p.getZ(i) + Math.sin(x * 9 + y * 2.5) * amt + (0.04 - x * x * 0.12)); }
+      geo.computeVertexNormals(); return geo;
+    }
+    var shapes = {};
+    function tee() { if (shapes.tee) return shapes.tee; var s = new THREE.Shape();
+      s.moveTo(-0.15, 0); s.quadraticCurveTo(0, -0.13, 0.15, 0); s.lineTo(0.40, -0.05); s.lineTo(0.66, -0.30); s.lineTo(0.52, -0.45); s.lineTo(0.39, -0.33);
+      s.lineTo(0.40, -1.05); s.quadraticCurveTo(0, -1.08, -0.40, -1.05); s.lineTo(-0.39, -0.33); s.lineTo(-0.52, -0.45); s.lineTo(-0.66, -0.30); s.lineTo(-0.40, -0.05); s.lineTo(-0.15, 0);
+      return (shapes.tee = drape(extrude(s, 0.05, 0.025), 0.018)); }
+    function hoodie() { if (shapes.hoodie) return shapes.hoodie; var s = new THREE.Shape();
+      s.moveTo(-0.17, 0); s.quadraticCurveTo(0, -0.12, 0.17, 0); s.lineTo(0.43, -0.06); s.lineTo(0.62, -0.32); s.lineTo(0.70, -0.98); s.lineTo(0.55, -1.0); s.lineTo(0.46, -0.44);
+      s.lineTo(0.44, -1.1); s.quadraticCurveTo(0, -1.12, -0.44, -1.1); s.lineTo(-0.46, -0.44); s.lineTo(-0.55, -1.0); s.lineTo(-0.70, -0.98); s.lineTo(-0.62, -0.32); s.lineTo(-0.43, -0.06); s.lineTo(-0.17, 0);
+      return (shapes.hoodie = drape(extrude(s, 0.08, 0.035), 0.022)); }
+    function jeans() { if (shapes.jeans) return shapes.jeans; var s = new THREE.Shape();
+      s.moveTo(-0.36, 0); s.lineTo(0.36, 0); s.lineTo(0.41, -1.5); s.lineTo(0.08, -1.5); s.lineTo(0.0, -0.46); s.lineTo(-0.08, -1.5); s.lineTo(-0.41, -1.5); s.lineTo(-0.36, 0);
+      return (shapes.jeans = drape(extrude(s, 0.07, 0.025), 0.012)); }
+    function dress() { if (shapes.dress) return shapes.dress; var s = new THREE.Shape();
+      s.moveTo(-0.13, 0); s.quadraticCurveTo(0, -0.14, 0.13, 0); s.lineTo(0.25, -0.02); s.lineTo(0.30, -0.30); s.lineTo(0.23, -0.56);
+      s.lineTo(0.58, -1.45); s.quadraticCurveTo(0, -1.55, -0.58, -1.45); s.lineTo(-0.23, -0.56); s.lineTo(-0.30, -0.30); s.lineTo(-0.25, -0.02); s.lineTo(-0.13, 0);
+      return (shapes.dress = drape(extrude(s, 0.05, 0.02), 0.03)); }
+    var hangerGeo = new THREE.TubeGeometry(new THREE.CatmullRomCurve3([new THREE.Vector3(-0.46, -0.08, 0), new THREE.Vector3(-0.2, 0.0, 0), new THREE.Vector3(0, 0.03, 0), new THREE.Vector3(0.2, 0.0, 0), new THREE.Vector3(0.46, -0.08, 0)]), 20, 0.025, 6);
+    var hookGeo = new THREE.TubeGeometry(new THREE.CatmullRomCurve3([new THREE.Vector3(0, 0.03, 0), new THREE.Vector3(0, 0.2, 0), new THREE.Vector3(0.04, 0.29, 0), new THREE.Vector3(0.1, 0.28, 0), new THREE.Vector3(0.11, 0.21, 0)]), 16, 0.012, 5);
+    function trim(w, y, hex, g) { var b = new THREE.Mesh(new THREE.BoxGeometry(w, 0.07, 0.07), new THREE.MeshStandardMaterial({ color: new THREE.Color(hex).multiplyScalar(0.8), roughness: 1 })); b.position.y = y; g.add(b); }
+
+    // a garment on a wooden hanger; origin = top of the hook (hangs from a rail)
+    function garment(kind, hex) {
+      var g = new THREE.Group(), body;
+      if (kind === "jeans") {
+        body = new THREE.Mesh(jeans(), cloth(hex, "denim")); body.position.y = -0.36; g.add(body);
+        trim(0.74, -0.38, hex, g);
+        var stitch = new THREE.MeshBasicMaterial({ color: 0xc8892e });
+        [-0.24, 0.24].forEach(function (x) { var arc = new THREE.Mesh(new THREE.TorusGeometry(0.12, 0.006, 4, 16, Math.PI), stitch); arc.rotation.z = Math.PI; arc.position.set(x, -0.5, 0.08); g.add(arc); });
+        var bar = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.04, 0.04), metal); bar.position.y = -0.3; g.add(bar);
+      } else {
+        var geo = kind === "hoodie" ? hoodie() : kind === "dress" ? dress() : tee();
+        body = new THREE.Mesh(geo, cloth(hex, "cotton")); body.position.y = -0.3; g.add(body);
+        if (kind === "hoodie") {
+          var hood = new THREE.Mesh(new THREE.SphereGeometry(0.22, 16, 10, 0, Math.PI * 2, 0, Math.PI / 2), cloth(hex, "cotton"));
+          hood.scale.set(1, 1.15, 0.55); hood.rotation.x = -0.35; hood.position.set(0, -0.3, -0.08); g.add(hood);
+          var pocket = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.24, 0.02), new THREE.MeshStandardMaterial({ color: new THREE.Color(hex).multiplyScalar(0.85), roughness: 1 })); pocket.position.set(0, -1.08, 0.1); g.add(pocket);
+          [-0.07, 0.07].forEach(function (x) { var cord = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.32, 5), white); cord.position.set(x, -0.5, 0.09); g.add(cord); });
+          trim(0.86, -1.36, hex, g);
+        }
+        if (kind === "tee") { var collar = new THREE.Mesh(new THREE.TorusGeometry(0.15, 0.018, 6, 18, Math.PI), cloth(hex, "cotton")); collar.rotation.z = Math.PI; collar.position.set(0, -0.3, 0.05); g.add(collar); }
+      }
+      var hang = new THREE.Mesh(hangerGeo, wood); hang.position.y = -0.28; g.add(hang);
+      var hook = new THREE.Mesh(hookGeo, metal); hook.position.y = -0.28; g.add(hook);
+      return g;
+    }
+
+    // one sneaker, ~1 unit long, origin at the middle of the sole
+    var sneakerGeo = {};
+    function sneakerParts() {
+      if (sneakerGeo.upper) return sneakerGeo;
+      var u = new THREE.Shape(); u.moveTo(0, 0.08); u.lineTo(0, 0.36); u.lineTo(0.08, 0.41); u.lineTo(0.28, 0.33); u.lineTo(0.42, 0.37); u.lineTo(0.63, 0.27); u.lineTo(0.86, 0.18); u.quadraticCurveTo(1.0, 0.15, 1.0, 0.08); u.lineTo(0, 0.08);
+      sneakerGeo.upper = extrude(u, 0.30, 0.035); sneakerGeo.upper.translate(-0.5, 0, 0);
+      var so = new THREE.Shape(); so.moveTo(-0.03, 0.02); so.lineTo(0.98, 0); so.quadraticCurveTo(1.07, 0.02, 1.03, 0.11); so.lineTo(-0.01, 0.11); so.lineTo(-0.03, 0.02);
+      sneakerGeo.sole = extrude(so, 0.34, 0.02); sneakerGeo.sole.translate(-0.5, 0, 0);
+      var p = new THREE.Shape(); p.moveTo(0.22, 0.12); p.lineTo(0.62, 0.12); p.lineTo(0.55, 0.26); p.lineTo(0.3, 0.3); p.lineTo(0.22, 0.12);
+      sneakerGeo.panel = extrude(p, 0.355, 0.01); sneakerGeo.panel.translate(-0.5, 0, 0);
+      sneakerGeo.lace = new THREE.BoxGeometry(0.035, 0.02, 0.26);
+      return sneakerGeo;
+    }
+    function sneaker(hex, accent) {
+      var P = sneakerParts(), g = new THREE.Group();
+      g.add(new THREE.Mesh(P.sole, white));
+      g.add(new THREE.Mesh(P.upper, new THREE.MeshStandardMaterial({ map: grain("lea" + hex, "#" + new THREE.Color(hex).getHexString()), roughness: 0.55 })));
+      g.add(new THREE.Mesh(P.panel, new THREE.MeshStandardMaterial({ color: accent, roughness: 0.6 })));
+      for (var i = 0; i < 5; i++) { var l = new THREE.Mesh(P.lace, white); var x = -0.08 + i * 0.045; l.position.set(x, 0.37 - i * 0.022 + 0.02, 0); l.rotation.z = -0.45; g.add(l); }
+      return g;
+    }
+    function pair(hex, accent, s) {
+      var g = new THREE.Group(); s = s || 1;
+      var a = sneaker(hex, accent), b = sneaker(hex, accent);
+      a.position.set(0, 0, -0.2); a.rotation.y = 0.12; b.position.set(0.12, 0, 0.2); b.rotation.y = -0.08;
+      g.add(a, b); g.scale.setScalar(s); return g;
+    }
+
+    // beads: glossy, in Maasai-style colour runs
+    var RUN = [0xC0362C, 0xC0362C, 0xC0362C, 0xF4F1E8, 0xF4F1E8, 0x1E4FD8, 0x1E4FD8, 0xFFC21A, 0xFFC21A, 0x15803D, 0x111110, 0xF28C28];
+    function beadMesh(points, r) {
+      var im = new THREE.InstancedMesh(new THREE.SphereGeometry(r, 8, 6), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.22, metalness: 0.05 }), points.length);
+      points.forEach(function (q, i) { M.compose(q, new THREE.Quaternion(), S1); im.setMatrixAt(i, M); im.setColorAt(i, new THREE.Color(RUN[i % RUN.length])); });
+      return im;
+    }
+    function necklace(len) {      // hanging U, origin at the hanging points' middle
+      var pts = [], n = Math.round(26 * (len || 1));
+      for (var i = 0; i < n; i++) { var a = i / (n - 1); pts.push(new THREE.Vector3((a - 0.5) * 0.42, -Math.sin(a * Math.PI) * 0.5 * (len || 1), Math.sin(a * Math.PI * 2) * 0.01)); }
+      return beadMesh(pts, 0.026);
+    }
+    function collar() {            // flat Maasai collar lying on a tray
+      var g = new THREE.Group(), pts = [];
+      [0.14, 0.18, 0.22, 0.26, 0.30].forEach(function (rad, ring) {
+        var n = Math.round(rad * 2 * Math.PI / 0.042);
+        for (var i = 0; i < n; i++) { var a = (i / n) * Math.PI * 1.7 + Math.PI * 0.65; pts.push(new THREE.Vector3(Math.cos(a) * rad, 0.03, Math.sin(a) * rad)); }
+      });
+      g.add(beadMesh(pts, 0.019));
+      var tray = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.38, 0.03, 28), wood); g.add(tray);
+      return g;
+    }
+    function bracelets(count) {
+      var g = new THREE.Group(), pts = [];
+      for (var b = 0; b < count; b++) { var cx = (b % 3) * 0.2 - 0.2, cz = Math.floor(b / 3) * 0.2 - 0.1;
+        for (var i = 0; i < 16; i++) { var a = i / 16 * Math.PI * 2; pts.push(new THREE.Vector3(cx + Math.cos(a) * 0.07, 0.03, cz + Math.sin(a) * 0.07)); } }
+      g.add(beadMesh(pts, 0.016));
+      var tray = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.03, 0.5), wood); g.add(tray);
+      return g;
+    }
+    function tote(hex) {
+      var g = new THREE.Group(), s = new THREE.Shape();
+      s.moveTo(-0.26, 0); s.lineTo(0.26, 0); s.lineTo(0.3, 0.5); s.lineTo(-0.3, 0.5); s.lineTo(-0.26, 0);
+      var body = new THREE.Mesh(extrude(s, 0.12, 0.02), cloth(hex, "cotton")); g.add(body);
+      [-0.12, 0.12].forEach(function (z) { var h = new THREE.Mesh(new THREE.TorusGeometry(0.13, 0.014, 6, 16, Math.PI), new THREE.MeshStandardMaterial({ color: 0x3b2a1a, roughness: 0.6 })); h.position.set(0, 0.5, 0); h.rotation.y = z > 0 ? 0 : 0; h.position.z = z * 0.25; g.add(h); });
+      return g;
+    }
+    function cap(hex) {
+      var g = new THREE.Group(), m = cloth(hex, "cotton");
+      var crown = new THREE.Mesh(new THREE.SphereGeometry(0.17, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2), m); crown.scale.set(1, 0.85, 1.1); g.add(crown);
+      var brim = new THREE.Mesh(new THREE.CircleGeometry(0.17, 20, -Math.PI / 2, Math.PI), m); brim.rotation.x = -Math.PI / 2 + 0.12; brim.scale.set(1, 1.35, 1); brim.position.set(0, 0.01, 0.06); g.add(brim);
+      var btn = new THREE.Mesh(new THREE.SphereGeometry(0.018, 8, 6), m); btn.position.y = 0.145; g.add(btn);
+      return g;
+    }
+    function rail(len, h) {        // freestanding chrome clothes rail
+      var g = new THREE.Group();
+      [-len / 2, len / 2].forEach(function (x) {
+        var up = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, h, 8), metal); up.position.set(x, h / 2, 0); g.add(up);
+        var foot = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.9, 8), metal); foot.rotation.x = Math.PI / 2; foot.position.set(x, 0.06, 0); g.add(foot);
+      });
+      var bar = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, len, 8), metal); bar.rotation.z = Math.PI / 2; bar.position.y = h; g.add(bar);
+      g.add(contact(len + 1, 1.6));
+      return g;
+    }
+    // fill a rail with garments: a couple face out, the rest hang side-on like a real rack
+    var THRIFT = [0x4B5320, 0x2B2B2B, 0xE8DFC8, 0xA0522D, 0x1F2F4F, 0x8C8C8C, 0xC9A227, 0x6D1F2C, 0x3E6E8E, 0x7A8450];
+    function stock(railG, len, h, items) {
+      var n = items.length;
+      items.forEach(function (it, i) {
+        var gm = garment(it[0], it[1]);
+        var faceOut = i === 0 || i === n - 1;
+        gm.position.set(-len / 2 + 0.45 + i * ((len - 0.9) / Math.max(1, n - 1)), h + 0.0, 0);
+        gm.rotation.y = faceOut ? (rnd() - 0.5) * 0.3 : Math.PI / 2 + (rnd() - 0.5) * 0.35;
+        railG.add(gm); spinners.push({ o: gm, kind: "sway", ph: i * 0.9 });
+      });
+    }
+    function foldedStack(hexes) {
+      var g = new THREE.Group();
+      hexes.forEach(function (hx, i) { var f = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.07, 0.46), cloth(hx, "cotton")); f.position.set((rnd() - 0.5) * 0.04, 0.035 + i * 0.075, (rnd() - 0.5) * 0.04); f.rotation.y = (rnd() - 0.5) * 0.08; g.add(f); });
+      return g;
+    }
+    return { garment: garment, pair: pair, necklace: necklace, collar: collar, bracelets: bracelets, tote: tote, cap: cap, rail: rail, stock: stock, foldedStack: foldedStack, contact: contact, THRIFT: THRIFT, wood: wood, metal: metal };
+  })();
+
+  function build() {
+    // HQ billboard at the start
+    (function () {
+      var at = placeAt(0.03, -1, 12), g = new THREE.Group();
+      var logo = new Image();
+      var bt = signTex(1024, 420, "#111110", function (c, w, h) {
+        c.fillStyle = "#FFD21F"; c.fillRect(0, h - 26, w, 26);
+        c.font = "64px " + DISPLAY; c.fillStyle = "#FFF6D6"; c.textAlign = "center";
+        c.fillText("THRIFT IT. TRUST IT.", w / 2, 290); c.fillStyle = "#FFD21F"; c.fillText("GET IT.", w / 2, 362);
+      });
+      logo.onload = function () { var c = bt.image.getContext("2d"); c.drawImage(logo, 1024 / 2 - 260, 30, 520, 153); bt.needsUpdate = true; };
+      logo.src = document.querySelector(".bar img").src;
+      var b = board(bt, 13, 5.3); b.position.y = 8.2; g.add(b);
+      [-5, 5].forEach(function (x) { var l = box(0.35, 6, 0.35, 0x3a372d); l.position.set(x, 3, -0.1); g.add(l); });
+      g.position.copy(at.pos); g.rotation.y = at.rotY; scene.add(g); focus.push([0.03, at.pos.clone().setY(6)]);
+    })();
+
+    function stall(t, sign, label, color, opts) {
+      opts = opts || {};
+      var at = placeAt(t, sign, opts.dist || 9.5), g = new THREE.Group(), col = new THREE.Color(color);
+      var base = new THREE.Mesh(new THREE.BoxGeometry(4, 2.2, 3), new THREE.MeshStandardMaterial({ color: 0x3a3226, roughness: 0.8 })); base.position.y = 1.1; g.add(base);
+      var counter = new THREE.Mesh(new THREE.BoxGeometry(4.15, 0.08, 3.1), GOODS.wood); counter.position.y = 2.2; g.add(counter);
+      var top = box(4.6, 0.35, 3.6, col.getHex(), col.clone().multiplyScalar(0.25).getHex()); top.position.y = 3.4; g.add(top);
+      [-2, 2].forEach(function (x) { var p = box(0.15, 3.3, 0.15, 0x3a372d); p.position.set(x, 1.65, 1.6); g.add(p); });
+      var st = signTex(512, 160, "#111110", function (g2, w, h) { g2.fillStyle = color; g2.fillRect(0, h - 16, w, 16); g2.fillStyle = opts.dim ? "#BDB391" : "#FFF6D6"; g2.font = (label.length > 9 ? "62px " : "84px ") + DISPLAY; g2.textAlign = "center"; g2.fillText(label, w / 2, 108); });
+      var b = board(st, 3.8, 1.2); b.position.set(0, 4.4, 1.6); g.add(b);
+      if (!opts.dim) { var bulb = new THREE.Mesh(bulbGeo, bulbMat); bulb.scale.setScalar(0.5); bulb.position.set(0, 3.05, 1.6); g.add(bulb); }
+      var sh = GOODS.contact(5.5, 4.5); g.add(sh);
+      if (opts.goods) opts.goods(g);
+      g.position.copy(at.pos); g.rotation.y = at.rotY; scene.add(g); return g;
+    }
+    var PALETTE = [0xFF5A36, 0x3B6FE0, 0xFFD21F, 0x22A65A, 0xD6458F, 0x8B5CF6, 0xFFF6D6, 0xF28C28];
+    function warmLight(pos, power) { var l = new THREE.PointLight(0xffd08a, power || 1.5, 24, 1.6); l.position.copy(pos); scene.add(l); }
+
+    // what each kind of stall shows on its counter
+    function shoesOn(g) { [[0xF3EFE4, 0x1E4FD8], [0x111110, 0xF3EFE4], [0xA0522D, 0xE8DFC8]].forEach(function (p, i) {
+      var pr = GOODS.pair(p[0], p[1], 0.62); pr.position.set(-1.25 + i * 1.25, 2.25, 0.75); pr.rotation.y = -0.55 + i * 0.12; g.add(pr); }); }
+    function clothesOn(g) { var r = GOODS.rail(3.2, 2.3); r.position.set(0, 0, 2.7); g.add(r);
+      GOODS.stock(r, 3.2, 2.3, [["hoodie", 0x4B5320], ["tee", 0xE8DFC8], ["jeans", 0x2F4F7F], ["tee", 0x6D1F2C], ["dress", 0xC9A227]]);
+      var s = GOODS.foldedStack([0x1F2F4F, 0x8C8C8C, 0xE8DFC8, 0xA0522D]); s.position.set(0.9, 2.24, 0.5); g.add(s); }
+    function beadsOn(g) { var c = GOODS.collar(); c.position.set(-0.85, 2.25, 0.55); c.scale.setScalar(1.7); g.add(c);
+      var b = GOODS.bracelets(6); b.position.set(0.95, 2.25, 0.65); b.scale.setScalar(1.7); g.add(b);
+      [-1.4, -0.5, 0.4, 1.3].forEach(function (x, i) { var n = GOODS.necklace(1 + (i % 2) * 0.35); n.position.set(x, 3.2, 1.55); n.scale.setScalar(1.35); g.add(n); }); }
+    function accOn(g) { [[0xE8DFC8, -1.3], [0x6D1F2C, -0.45]].forEach(function (t) { var o = GOODS.tote(t[0]); o.position.set(t[1], 2.25, 0.55); o.scale.setScalar(1.6); o.rotation.y = 0.35; g.add(o); });
+      [[0x111110, 0.6], [0xC9A227, 1.35]].forEach(function (c) { var o = GOODS.cap(c[0]); o.position.set(c[1], 2.25, 0.8); o.scale.setScalar(1.6); o.rotation.y = -0.7; g.add(o); }); }
+    function coverOn(g) { var m = new THREE.Mesh(new THREE.BoxGeometry(4.1, 0.7, 3.1), new THREE.MeshStandardMaterial({ color: 0x6b6450, roughness: 1 })); m.position.y = 2.55; g.add(m); }
+
+    // Stop 1: Sosick rails: real clothes on hangers, a shoe wall, a bead stand
+    (function () {
+      var at = placeAt(0.165, -1, 9.5), g = new THREE.Group();
+      var floor = new THREE.Mesh(new THREE.BoxGeometry(11, 0.25, 5.2), GOODS.wood); floor.position.y = 0.125; g.add(floor);
+      var r1 = GOODS.rail(5.4, 2.6); r1.position.set(-2.2, 0.25, 0.5); g.add(r1);
+      GOODS.stock(r1, 5.4, 2.6, [["hoodie", 0x2B2B2B], ["tee", 0xE8DFC8], ["tee", 0xA0522D], ["hoodie", 0x4B5320], ["jeans", 0x2F4F7F], ["tee", 0x1F2F4F], ["dress", 0xC9A227], ["hoodie", 0x8C8C8C]]);
+      var r2 = GOODS.rail(3.2, 2.6); r2.position.set(3.0, 0.25, -0.7); r2.rotation.y = -0.5; g.add(r2);
+      GOODS.stock(r2, 3.2, 2.6, [["dress", 0x6D1F2C], ["jeans", 0x3E6E8E], ["tee", 0xF3EFE4], ["dress", 0x3E6E8E]]);
+      var table = new THREE.Mesh(new THREE.BoxGeometry(2.4, 1.0, 1.2), GOODS.wood); table.position.set(2.7, 0.75, 1.7); g.add(table);
+      [[0xE8DFC8, 0x2B2B2B, 0xA0522D, 0x4B5320], [0x1F2F4F, 0x8C8C8C, 0xC9A227]].forEach(function (st, i) { var s2 = GOODS.foldedStack(st); s2.position.set(2.15 + i * 1.0, 1.25, 1.7); g.add(s2); });
+      var st = signTex(1024, 220, "#111110", function (c, w, h) { c.fillStyle = "#FFD21F"; c.font = "96px " + DISPLAY; c.textAlign = "center"; c.fillText("SOSICK RAILS", w / 2, 120); c.fillStyle = "#FFF6D6"; c.font = "600 44px " + BODY; c.fillText("Our own thrift · picked by us", w / 2, 190); });
+      var b = board(st, 8, 1.7); b.position.set(0, 5.2, -1.8); g.add(b);
+      [-3.6, 3.6].forEach(function (x) { var p = box(0.18, 4.4, 0.18, 0x3a372d); p.position.set(x, 2.2, -1.85); g.add(p); });
+      g.position.copy(at.pos); g.rotation.y = at.rotY; scene.add(g); focus.push([0.165, at.pos.clone().setY(2.2)]);
+      warmLight(at.pos.clone().setY(5.5), 1.8);
+
+      // shoe wall
+      var at2 = placeAt(0.19, 1, 9.5), w2 = new THREE.Group();
+      var wall = new THREE.Mesh(new THREE.BoxGeometry(9, 5.5, 0.6), new THREE.MeshStandardMaterial({ color: 0x2a2620, roughness: 0.9 })); wall.position.y = 2.75; w2.add(wall);
+      var shoeCols = [[0xF3EFE4, 0x1E4FD8], [0x111110, 0xF3EFE4], [0xA0522D, 0xE8DFC8], [0x6D1F2C, 0xF3EFE4], [0xE8DFC8, 0x15803D], [0x1F2F4F, 0xC9A227], [0x8C8C8C, 0x111110], [0xF3EFE4, 0xC0362C], [0x4B5320, 0xE8DFC8]];
+      for (var r = 0; r < 3; r++) {
+        var shelf = new THREE.Mesh(new THREE.BoxGeometry(8.6, 0.1, 1.1), GOODS.wood); shelf.position.set(0, 1.0 + r * 1.5, 0.65); w2.add(shelf);
+        for (var q = 0; q < 3; q++) { var c2 = shoeCols[r * 3 + q], pr = GOODS.pair(c2[0], c2[1], 0.85); pr.position.set(-2.8 + q * 2.8, 1.06 + r * 1.5, 0.7); pr.rotation.y = -0.5; w2.add(pr); }
+      }
+      var st2 = signTex(1024, 160, "#FF5A36", function (c, w, h) { c.fillStyle = "#111110"; c.font = "92px " + DISPLAY; c.textAlign = "center"; c.fillText("THRIFT KICKS", w / 2, 116); });
+      var b2 = board(st2, 6.5, 1); b2.position.set(0, 6.1, 0.35); w2.add(b2);
+      w2.add(GOODS.contact(10, 3));
+      w2.position.copy(at2.pos); w2.rotation.y = at2.rotY; scene.add(w2);
+      warmLight(at2.pos.clone().setY(5), 1.4);
+
+      // bead stand: hanging necklaces, a Maasai collar and bracelets on the table
+      var at3 = placeAt(0.215, -1, 9.5), b3 = new THREE.Group();
+      var table3 = new THREE.Mesh(new THREE.BoxGeometry(5, 1.1, 2.4), GOODS.wood); table3.position.y = 0.55; b3.add(table3);
+      var frame = new THREE.Mesh(new THREE.BoxGeometry(4.6, 0.12, 0.12), GOODS.wood); frame.position.set(0, 3.9, -0.6); b3.add(frame);
+      [-2.3, 2.3].forEach(function (x) { var p = new THREE.Mesh(new THREE.BoxGeometry(0.12, 2.8, 0.12), GOODS.wood); p.position.set(x, 2.5, -0.6); b3.add(p); });
+      for (var k = 0; k < 6; k++) { var nk = GOODS.necklace(1 + (k % 3) * 0.25); nk.position.set(-1.9 + k * 0.76, 3.85, -0.6); nk.scale.setScalar(1.5); b3.add(nk); }
+      var col = GOODS.collar(); col.position.set(-1.2, 1.12, 0.4); col.scale.setScalar(2.0); b3.add(col);
+      var br = GOODS.bracelets(6); br.position.set(1.1, 1.12, 0.5); br.scale.setScalar(2.0); b3.add(br);
+      var st3 = signTex(1024, 160, "#FFD21F", function (c, w, h) { c.fillStyle = "#111110"; c.font = "88px " + DISPLAY; c.textAlign = "center"; c.fillText("HANDMADE BEADS", w / 2, 112); });
+      var bb = board(st3, 5, 0.8); bb.position.set(0, 4.5, -0.6); b3.add(bb);
+      b3.add(GOODS.contact(6, 3.5));
+      b3.position.copy(at3.pos); b3.rotation.y = at3.rotY; scene.add(b3);
+    })();
+
+    // Stop 2: category stalls, each showing its goods
+    (function () {
+      var cats = [["SHOES", "#FF5A36", shoesOn], ["CLOTHES", "#3B6FE0", clothesOn], ["BEADS", "#FFD21F", beadsOn], ["ACCESSORIES", "#8B5CF6", accOn], ["MORE SOON", "#5E5947", coverOn, 1], ["MORE SOON", "#5E5947", coverOn, 1]];
+      cats.forEach(function (c, i) { stall(0.34 + i * 0.012, i % 2 ? 1 : -1, c[0], c[1], { dim: !!c[3], goods: c[2] }); });
+      focus.push([0.37, curve.getPointAt(0.37).setY(2.5)]);
+      warmLight(curve.getPointAt(0.355).setY(6), 1.6); warmLight(curve.getPointAt(0.385).setY(6), 1.6);
+    })();
+
+    // Stop 3: Verified Plugs: an arch over the road, tested stalls with their goods, the badge
+    (function () {
+      var at = placeAt(0.535, 1, 0), g = new THREE.Group();
+      [-7, 7].forEach(function (x) { var p = box(0.9, 7, 0.9, 0x111110); p.position.set(x, 3.5, 0); g.add(p); var c = box(1.2, 0.4, 1.2, 0xFFD21F); c.position.set(x, 7.2, 0); g.add(c); });
+      var st = signTex(1024, 180, "#111110", function (c, w, h) { c.fillStyle = "#FFD21F"; c.fillRect(0, 0, w, 14); c.fillRect(0, h - 14, w, 14); c.font = "92px " + DISPLAY; c.textAlign = "center"; c.fillText("VERIFIED PLUGS", w / 2, 108); c.fillStyle = "#FFF6D6"; c.font = "700 32px " + MONO; c.fillText("TESTED BY SOSICK · 5 CHECKS", w / 2, 156); });
+      var b = board(st, 14, 2.5); b.position.set(0, 6.4, 0); g.add(b);
+      g.position.copy(at.road); g.rotation.y = at.rotY + Math.PI / 2; scene.add(g);
+      [shoesOn, clothesOn, accOn, beadsOn].forEach(function (fn, i) { stall(0.55 + i * 0.011, i % 2 ? -1 : 1, "✓ VERIFIED", "#FFD21F", { goods: fn }); });
+      warmLight(curve.getPointAt(0.565).setY(6), 1.7);
+      var mid = curve.getPointAt(0.57), badge = new THREE.Group();
+      var bt = signTex(512, 512, "rgba(0,0,0,0)", function (c, w, h) {
+        c.clearRect(0, 0, w, h); c.fillStyle = "#FFD21F"; c.beginPath(); c.arc(256, 256, 250, 0, Math.PI * 2); c.fill();
+        c.fillStyle = "#111110"; c.beginPath(); c.arc(256, 256, 214, 0, Math.PI * 2); c.fill();
+        c.fillStyle = "#FFD21F"; c.textAlign = "center"; c.font = "190px " + DISPLAY; c.fillText("✓", 256, 270);
+        c.font = "54px " + DISPLAY; c.fillText("VERIFIED", 256, 360); c.font = "700 30px " + MONO; c.fillStyle = "#FFF6D6"; c.fillText("SOSICK TEST · 5/5", 256, 410);
+      });
+      badge.add(new THREE.Mesh(new THREE.CircleGeometry(2.6, 48), new THREE.MeshBasicMaterial({ map: bt, transparent: true, side: THREE.DoubleSide, fog: false })));
+      badge.add(new THREE.Mesh(new THREE.TorusGeometry(2.75, 0.14, 8, 48), new THREE.MeshBasicMaterial({ color: SUN })));
+      badge.position.set(mid.x, 9.5, mid.z); scene.add(badge);
+      spinners.push({ o: badge, kind: "spin" }); focus.push([0.57, badge.position.clone()]);
+    })();
+
+    // Stop 4: sell with Sosick billboard
+    (function () {
+      var at = placeAt(0.76, -1, 11), g = new THREE.Group();
+      var st = signTex(1024, 512, "#111110", function (c, w, h) {
+        c.fillStyle = "#FFD21F"; c.fillRect(0, 0, w, 96); c.fillStyle = "#111110"; c.font = "700 46px " + MONO; c.fillText("SELL WITH SOSICK", 40, 64);
+        c.setLineDash([22, 14]); c.strokeStyle = "#FFD21F"; c.lineWidth = 8; c.strokeRect(40, 130, w - 80, 230); c.setLineDash([]);
+        c.fillStyle = "#FFF6D6"; c.font = "104px " + DISPLAY; c.textAlign = "center"; c.fillText("YOUR SHOP HERE", w / 2, 285);
+        c.fillStyle = "#FFD21F"; c.font = "700 38px " + MONO; c.fillText("GET TESTED · GET VERIFIED · GET SEEN", w / 2, 430);
+        c.fillStyle = "#BDB391"; c.font = "600 32px " + BODY; c.fillText("The badge is earned, never bought", w / 2, 482);
+      });
+      var b = board(st, 11, 5.5); b.position.y = 7.5; g.add(b);
+      [-4.5, 4.5].forEach(function (x) { var l = box(0.35, 5, 0.35, 0x3a372d); l.position.set(x, 2.5, -0.1); g.add(l); });
+      g.position.copy(at.pos); g.rotation.y = at.rotY; scene.add(g); focus.push([0.76, at.pos.clone().setY(6.5)]);
+    })();
+
+    // Stop 5: drop point (get it)
+    (function () {
+      var at = placeAt(0.9, 1, 9), g = new THREE.Group();
+      [-4, 4].forEach(function (x) { var p = box(1.3, 5.2, 1.3, 0xd9c9a0); p.position.set(x, 2.6, 0); g.add(p);
+        var cap = box(1.6, 0.4, 1.6, 0xFFD21F); cap.position.set(x, 5.4, 0); g.add(cap); });
+      for (var i = 0; i < 9; i++) { var bar = box(0.12, 3.4, 0.12, 0x111110); bar.position.set(-3 + i * 0.75, 1.7, 0); g.add(bar); }
+      var rail = box(7, 0.2, 0.2, 0x111110); rail.position.set(0, 3.3, 0); g.add(rail);
+      var st = signTex(1024, 300, "#FFD21F", function (c, w, h) {
+        c.fillStyle = "#111110"; c.textAlign = "center"; c.font = "120px " + DISPLAY; c.fillText("DROP POINT", w / 2, 150);
+        c.font = "600 50px " + BODY; c.fillText("Check it, then pay", w / 2, 236);
+      });
+      var b = board(st, 8.4, 2.4); b.position.set(0, 7, 0); g.add(b);
+      var hostel = box(16, 9, 7, 0x3b362a); hostel.position.set(0, 4.5, -8); hostel.material = buckets[1].mat; g.add(hostel);
+      g.position.copy(at.pos); g.rotation.y = at.rotY; scene.add(g); focus.push([0.9, at.pos.clone().setY(4)]);
+    })();
+
+    // The end of the route: the Sosick shop, with Sosi at the door
+    (function () {
+      var g = new THREE.Group();
+      var pad = new THREE.Mesh(new THREE.CircleGeometry(11, 40), new THREE.MeshLambertMaterial({ color: 0x2d2a22 }));
+      pad.rotation.x = -Math.PI / 2; pad.position.set(0, 0.03, 6); g.add(pad);
+      var body = box(17, 8, 9, 0x1f1d18); body.position.y = 4; g.add(body);
+      var trim = box(17.4, 0.7, 9.4, 0xFFD21F, 0x4a3a00); trim.position.y = 8.2; g.add(trim);
+      var base = box(17.4, 0.5, 9.4, 0xFFD21F); base.position.y = 0.25; g.add(base);
+      var shopTex = signTex(1024, 420, "#FFB224", function (c, w, h) {
+        var gr = c.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, "#FFE9A0"); gr.addColorStop(1, "#FF9F1C"); c.fillStyle = gr; c.fillRect(0, 0, w, h);
+        c.fillStyle = "rgba(17,17,16,.85)";
+        for (var r = 0; r < 3; r++) { c.fillRect(30, 120 + r * 100, w - 60, 10);
+          for (var k = 0; k < 9; k++) { var bw = 40 + (k * 37 % 50), bh = 30 + (k * 53 % 45); c.fillRect(50 + k * 105, 120 + r * 100 - bh, bw, bh); } }
+        c.fillStyle = "#111110"; c.font = "64px " + DISPLAY; c.textAlign = "center"; c.fillText("OPEN · KARIBU", w / 2, 70);
+        c.lineWidth = 12; c.strokeStyle = "#111110"; c.strokeRect(6, 6, w - 12, h - 12);
+      });
+      var win = new THREE.Mesh(new THREE.PlaneGeometry(11, 4.5), new THREE.MeshBasicMaterial({ map: shopTex, fog: false })); win.position.set(-1.6, 3, 4.52); g.add(win);
+      var door = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 5), new THREE.MeshBasicMaterial({ color: 0xFFE9A0, fog: false })); door.position.set(6, 2.75, 4.52); g.add(door);
+      var stripes = tex(256, 64, function (c) { for (var i = 0; i < 8; i++) { c.fillStyle = i % 2 ? "#111110" : "#FFD21F"; c.fillRect(i * 32, 0, 32, 64); } });
+      stripes.wrapS = THREE.RepeatWrapping; stripes.repeat.set(2, 1);
+      var aw = new THREE.Mesh(new THREE.PlaneGeometry(16, 2.6), new THREE.MeshLambertMaterial({ map: stripes, side: THREE.DoubleSide, emissive: 0x221a00 }));
+      aw.position.set(0, 6.3, 5.6); aw.rotation.x = -Math.PI / 2 + 0.55; g.add(aw);
+      var logo = new Image();
+      var lt = signTex(1024, 300, "#111110", function () {});
+      logo.onload = function () { var c = lt.image.getContext("2d"); c.drawImage(logo, 1024 / 2 - 470, 12, 940, 276); lt.needsUpdate = true; };
+      logo.src = document.querySelector(".bar img").src;
+      var sign = board(lt, 14, 4.1); sign.position.set(0, 11, 3.6); g.add(sign);
+      [-5.5, 5.5].forEach(function (x) { var p = box(0.3, 2.6, 0.3, 0x3a372d); p.position.set(x, 9.4, 3.5); g.add(p); });
+      var glow = new THREE.Mesh(new THREE.PlaneGeometry(22, 14), glowMat); glow.rotation.x = -Math.PI / 2; glow.position.set(0, 0.06, 8); g.add(glow);
+      var warm = new THREE.PointLight(0xffc35a, 1.4, 34); warm.position.set(0, 5, 9); g.add(warm);
+
+      // Sosi, the shopping bag, waiting at the door
+      var sosi = new THREE.Group();
+      var bag = new THREE.Mesh(new THREE.BoxGeometry(1.7, 1.9, 1.1), new THREE.MeshLambertMaterial({ color: 0xFFD21F, emissive: 0x3a2c00 })); bag.position.y = 0.95; sosi.add(bag);
+      var inkM = new THREE.MeshBasicMaterial({ color: 0x111110 });
+      var handle = new THREE.Mesh(new THREE.TorusGeometry(0.45, 0.09, 8, 20, Math.PI), inkM); handle.position.y = 1.9; sosi.add(handle);
+      [-0.38, 0.38].forEach(function (x) { var e = new THREE.Mesh(new THREE.SphereGeometry(0.13, 12, 10), inkM); e.scale.set(1, 1.4, 0.5); e.position.set(x, 1.22, 0.56); sosi.add(e); });
+      var mouth = new THREE.Mesh(new THREE.TorusGeometry(0.26, 0.055, 8, 20, Math.PI), inkM); mouth.rotation.z = Math.PI; mouth.position.set(0, 0.78, 0.56); sosi.add(mouth);
+      var hi = signTex(512, 160, "#FFF6D6", function (c, w, h) { c.fillStyle = "#111110"; c.font = "88px " + DISPLAY; c.textAlign = "center"; c.fillText("KARIBU!", w / 2, 112); });
+      var hiB = board(hi, 2.6, 0.8); hiB.position.set(0, 2.9, 0); sosi.add(hiB);
+      sosi.position.set(2.6, 0.5, 6.2); sosi.scale.setScalar(1.3); g.add(sosi);
+      spinners.push({ o: sosi, kind: "sosi" });
+
+      g.position.copy(SHOP_C); g.rotation.y = Math.atan2(-END_T.x, -END_T.z); scene.add(g);
+      focus.push([0.99, SHOP_C.clone().setY(5), 0.85]);
+    })();
+  }
+
+  // the rider
+  var rider = new THREE.Group(), wheels = [];
+  (function () {
+    var yellow = new THREE.MeshLambertMaterial({ color: SUN }), ink = new THREE.MeshLambertMaterial({ color: 0x141310 }), chalk = new THREE.MeshLambertMaterial({ color: 0xfff6d6 });
+    var body = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.45, 1.7), yellow); body.position.set(0, 0.62, 0); rider.add(body);
+    var nose = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.9, 0.3), yellow); nose.position.set(0, 0.95, 0.75); nose.rotation.x = -0.25; rider.add(nose);
+    var bar = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.08, 0.08), ink); bar.position.set(0, 1.5, 0.72); rider.add(bar);
+    var lamp = new THREE.Mesh(new THREE.SphereGeometry(0.13, 10, 8), new THREE.MeshBasicMaterial({ color: 0xfff3c0 })); lamp.position.set(0, 1.2, 0.93); rider.add(lamp);
+    var seat = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.16, 0.8), ink); seat.position.set(0, 0.93, -0.2); rider.add(seat);
+    [0.78, -0.72].forEach(function (z) {
+      var w = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.34, 0.2, 18), ink); w.rotation.z = Math.PI / 2; w.position.set(0, 0.34, z);
+      var hub = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.5, 0.08), chalk); w.add(hub);
+      rider.add(w); wheels.push(w);
+    });
+    var torso = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.28, 0.75, 10), ink); torso.position.set(0, 1.4, -0.1); torso.rotation.x = 0.25; rider.add(torso);
+    var helmet = new THREE.Mesh(new THREE.SphereGeometry(0.27, 16, 12), yellow); helmet.position.set(0, 1.95, 0.02); rider.add(helmet);
+    var visor = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.13, 0.1), ink); visor.position.set(0, 1.95, 0.27); rider.add(visor);
+    var ptex = tex(256, 256, function (c, w, h) {
+      c.fillStyle = "#D9A44E"; c.fillRect(0, 0, w, h); c.fillStyle = "#FFD21F"; c.fillRect(w / 2 - 26, 0, 52, h);
+      c.fillStyle = "#111110"; c.fillRect(30, 96, 196, 64); c.fillStyle = "#FFD21F"; c.font = "48px " + DISPLAY; c.textAlign = "center"; c.fillText("SOSICK", 128, 146);
+      c.strokeStyle = "#111110"; c.lineWidth = 8; c.strokeRect(4, 4, w - 8, h - 8);
+    });
+    var parcel = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.85, 0.85), new THREE.MeshLambertMaterial({ map: ptex })); parcel.position.set(0, 1.42, -0.78); rider.add(parcel);
+    var head = new THREE.SpotLight(0xffe7a0, 1.4, 26, 0.5, 0.6); head.position.set(0, 1.2, 0.95); head.target.position.set(0, 0, 8); rider.add(head, head.target);
+    var shadow = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 2.6), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.35, depthWrite: false }));
+    shadow.rotation.x = -Math.PI / 2; shadow.position.y = 0.06; rider.add(shadow);
+    rider.scale.setScalar(1.25);
+    scene.add(rider);
+  })();
+
+  // scroll → position on the route
+  var chaps = Array.prototype.slice.call(document.querySelectorAll("[data-t]"));
+  var rail = Array.prototype.slice.call(document.querySelectorAll("#rail a"));
+  var centers = [], lastStop = -1;
+  function measure() { centers = chaps.map(function (c) { return c.offsetTop + c.offsetHeight / 2; }); }
+  function targetT() {
+    var mid = scrollY + innerHeight / 2, ts = chaps.map(function (c) { return parseFloat(c.dataset.t); });
+    if (mid <= centers[0]) return ts[0];
+    for (var i = 0; i < centers.length - 1; i++) {
+      if (mid <= centers[i + 1]) { var f = (mid - centers[i]) / (centers[i + 1] - centers[i]); return ts[i] + (ts[i + 1] - ts[i]) * f; }
+    }
+    return ts[ts.length - 1];
+  }
+  function markRail() {
+    var mid = scrollY + innerHeight / 2, best = 0;
+    centers.forEach(function (c, i) { if (Math.abs(c - mid) < Math.abs(centers[best] - mid)) best = i; });
+    rail.forEach(function (a, i) { if (i === best) a.setAttribute("aria-current", "step"); else a.removeAttribute("aria-current"); });
+    if (best !== lastStop) { if (lastStop !== -1 && window.sosiAt) window.sosiAt(chaps[best].id); lastStop = best; }
+  }
+
+  var cur = 0, prev = 0, camPos = new THREE.Vector3(), look = new THREE.Vector3(), first = true;
+  var tmp = new THREE.Vector3(), clock = new THREE.Clock(), curveLen = curve.getLength();
+  function frame() {
+    var dt = Math.min(clock.getDelta(), 0.05), time = clock.elapsedTime;
+    var target = Math.min(0.995, Math.max(0, targetT()));
+    cur += (target - cur) * (calm ? 0.25 : 0.075);
+    var p = curve.getPointAt(cur), tg = curve.getTangentAt(Math.min(cur + 0.002, 1)), sd = new THREE.Vector3(tg.z, 0, -tg.x).normalize();
+    // ride slightly left of centre in the right lane
+    rider.position.copy(p).add(sd.clone().multiplyScalar(-1.6));
+    if (!calm) rider.position.y = Math.sin(time * 9) * 0.03;
+    rider.lookAt(tmp.copy(rider.position).add(tg));
+    var speed = (cur - prev) * curveLen / Math.max(dt, 0.001); prev = cur;
+    wheels.forEach(function (w) { w.rotation.x += speed * dt / 0.42; });
+    rider.rotation.z = THREE.MathUtils.clamp(-speed * 0.004, -0.2, 0.2);
+
+    // camera: behind and to the side; wider and higher at the start
+    var wide = innerWidth > 760;
+    var hero = THREE.MathUtils.clamp(1 - cur / 0.08, 0, 1);
+    var cp = p.clone().addScaledVector(tg, -10).addScaledVector(UP, 5.4).addScaledVector(sd, wide ? 3.6 : 2);
+    var heroPos = p.clone().addScaledVector(tg, -9).addScaledVector(UP, 6.5).addScaledVector(sd, wide ? 7 : 4);
+    cp.lerp(heroPos, hero);
+    var lk = p.clone().addScaledVector(tg, 6).addScaledVector(UP, wide ? 1.5 : -0.5).addScaledVector(sd, wide ? -2.5 : 0);
+    focus.forEach(function (f) { var w = Math.exp(-Math.pow((cur - f[0]) / 0.04, 2)); lk.lerp(f[1], w * (f[2] || 0.55)); });
+    var endF = THREE.MathUtils.clamp((cur - 0.95) / 0.045, 0, 1);
+    cp.lerp(p.clone().addScaledVector(tg, -12).addScaledVector(UP, 6.5).addScaledVector(sd, wide ? 5 : 2), endF);
+    if (first) { camPos.copy(cp); look.copy(lk); first = false; }
+    camPos.lerp(cp, calm ? 0.3 : 0.08); look.lerp(lk, calm ? 0.3 : 0.1);
+    camera.position.copy(camPos); camera.lookAt(look);
+
+    spinners.forEach(function (s) {
+      if (calm) return;
+      if (s.kind === "spin") { s.o.rotation.y += dt * 0.9; s.o.position.y = 9.5 + Math.sin(time * 1.6) * 0.4; }
+      else if (s.kind === "sway") { s.o.rotation.z = Math.sin(time * 1.4 + s.ph) * 0.08; }
+      else if (s.kind === "sosi") {
+        var arrived = cur > 0.96;
+        s.o.position.y = 0.5 + (arrived ? Math.abs(Math.sin(time * 5)) * 0.7 : Math.sin(time * 2) * 0.08);
+        s.o.rotation.y = arrived ? Math.sin(time * 5) * 0.25 : Math.sin(time * 0.8) * 0.15;
+      }
+      else { s.o.position.y = 5 + Math.sin(time * 1.3) * 0.35; s.o.rotation.z = Math.sin(time * 0.9) * 0.05; }
+    });
+    renderer.render(scene, camera);
+    raf = requestAnimationFrame(frame);
+  }
+  function resize() {
+    renderer.setSize(innerWidth, innerHeight, false);
+    camera.aspect = innerWidth / innerHeight; camera.fov = innerWidth < 760 ? 62 : 50; camera.updateProjectionMatrix();
+    measure(); markRail();
+  }
+  var raf = 0;
+  addEventListener("resize", resize);
+  addEventListener("scroll", markRail, { passive: true });
+  document.addEventListener("visibilitychange", function () { if (document.hidden) cancelAnimationFrame(raf); else { clock.getDelta(); raf = requestAnimationFrame(frame); } });
+
+  // draw signs once the fonts are in, so the 3D text uses the real type
+  var started = false;
+  function start() { if (started) return; started = true; build(); resize(); raf = requestAnimationFrame(frame); }
+  if (document.fonts && document.fonts.ready) { document.fonts.ready.then(start); setTimeout(start, 1800); } else start();
+})();
+</script>
+<script>try{document.getElementById("yr").textContent=new Date().getFullYear()}catch(e){}</script>
 </body>
 </html>
