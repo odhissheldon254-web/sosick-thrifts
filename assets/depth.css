@@ -180,3 +180,7 @@
 
 /* separate Straight answers from the black route board above it */
 #faq { border-top: 3px dashed var(--sun); }
+
+/* Verified Plugs: how you buy (on the dark band) */
+.plug-how { color: var(--muted-ink); max-width: 70ch; margin: 24px 0 0; }
+.plug-how strong { color: var(--sun); }

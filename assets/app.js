@@ -204,7 +204,7 @@
     S.extraFees = rows.some(function (c) { return c.is_on && c.id !== "base"; });
     var feeText = S.deliveryFeeFrom ? "from KES " + Number(S.deliveryFeeFrom).toLocaleString("en-KE") : "confirmed on WhatsApp";
     $("feeLine").innerHTML = "Delivery fee: <strong>" + esc(feeText) + "</strong> before pickup." + (S.extraFees ? "" : " No extra charges.");
-    $("comradeSticker").textContent = S.extraFees ? "Now delivering across Nairobi" : "Comrade launch · just delivery, no extra charges";
+    $("comradeSticker").textContent = S.extraFees ? "Now delivering across Nairobi" : "Comrade launch · no extra charges";
   }
 
   function loadLive() {

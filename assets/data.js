@@ -45,6 +45,7 @@ window.SOSICK = {
   // Add a category = add one line here; its page works automatically.
   categories: [
     { id: "kicks",   label: "Sneakers & Shoes", short: "Kicks", emoji: "👟", tile: "#FF5A36", tagline: "AF1s, dad shoes, Timbs, sandals. Fresh or barely worn.", item: "Sneakers, size ", words: ["sneakers", "shoes", "kicks", "sneaker", "airforce", "af1", "jordans", "boots", "sandals"] },
+    { id: "beads",   label: "Handmade Beads", short: "Beads", emoji: "📿", tile: "#C0362C", tagline: "Handmade by Sosick: bracelets, necklaces, anklets and more.", item: "Beads: ", words: ["beads", "bead", "beaded", "bracelet", "bracelets", "necklace", "necklaces", "anklet", "anklets", "shanga"] },
     { id: "denim",   label: "Denim & Jeans",   short: "Denim", emoji: "👖", tile: "#3B6FE0", tagline: "Baggy, straight, ripped, jorts. Every wash, every size.", item: "Jeans, size ", words: ["jeans", "denim", "trouser", "trousers", "jorts"] },
     { id: "tops",    label: "Tees, Shirts & Hoodies", short: "Tops & Hoodies", emoji: "👕", tile: "#22A65A", tagline: "Vintage tees, hoodies, jackets and shirts for every mood.", item: "Hoodie, size ", words: ["tshirt", "t-shirt", "tee", "shirt", "hoodie", "sweater", "top", "tops", "jacket", "jackets"] },
     { id: "dresses", label: "Dresses & Skirts", short: "Dresses", emoji: "👗", tile: "#D6458F", tagline: "From Sunday best to Saturday out.", item: "Dress, size ", words: ["dress", "dresses", "skirt", "skirts", "gown"] },

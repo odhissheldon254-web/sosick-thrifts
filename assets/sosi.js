@@ -136,6 +136,10 @@
     if (/do you deliver|mna deliver|deliver to|mnafika|you reach|reach /.test(low) || (place && low.length < 40)) {
       return checkArea(low, place);
     }
+    if (/what do you sell|what does sosick sell|your (own )?products|mnauza nini|bidhaa zenu|do you sell/.test(low)) {
+      return bot(t("Sosick sells its own pieces: <b>thrift shoes, thrift clothes and handmade beads</b>, picked and made by us. Plus Verified Plugs, sellers we've tested. Check <b>Categories</b>, or tell me what you're hunting.",
+        "Sosick inauza vitu zake: <b>viatu za thrift, nguo za thrift na shanga za mkono</b>, tumechagua na kutengeneza wenyewe. Pia kuna Verified Plugs, sellers tumetest. Angalia <b>Categories</b>, ama niambie unatafuta nini."), ["🔌 Find a plug", "🛵 Order something", "💸 Charges?"]);
+    }
     if (has(low, ["verified", "verify", "trust", "legit", "scam", "test", "badge", "proven"])) {
       return bot(t(
         "Every Verified Plug passed the <b>Sosick Test</b>: we buy from them in secret, check the item matches the photos, check the price is honest, time the delivery and see how they handle problems. Fail one check and there's no badge.",
