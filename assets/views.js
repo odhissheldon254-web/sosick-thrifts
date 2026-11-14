@@ -4,7 +4,7 @@
 (function () {
   "use strict";
   // Which screen each anchor lives on.
-  var VIEW_OF = { "": "home", top: "home", home: "home", categories: "home", fresh: "home",
+  var VIEW_OF = { "": "home", top: "home", home: "home", categories: "home", fresh: "home", faq: "info",
     order: "order", track: "track", plugs: "plugs", info: "info", how: "info", areas: "info" };
   var current = null;
 

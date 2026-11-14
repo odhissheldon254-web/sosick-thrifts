@@ -11,7 +11,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=202610311751">
+<link rel="stylesheet" href="assets/style.css?v=202611151200">
+<link rel="stylesheet" href="assets/fancy.css?v=202611151200">
+<link rel="stylesheet" href="assets/depth.css?v=202611151200">
 </head>
 <body>
 
@@ -37,24 +39,70 @@
   <div class="view view-home" data-view="home">
   <!-- HERO: the two engines side by side, equal weight -->
   <section class="hero">
-    <div class="wrap">
-      <p class="sticker" id="comradeSticker">Comrade launch · just delivery, no extra charges</p>
-      <h1 class="hero-title">Order it.<br>We pick it.<br><span class="hl">We drop it.</span></h1>
-      <p class="hero-sub">From any shop in Nairobi to your gate, hostel or office. Can't find a plug for what you want? Shop from sellers we've tested ourselves.</p>
+    <div class="wrap hero-grid">
+      <div class="hero-text">
+        <p class="sticker" id="comradeSticker">Comrade launch · just delivery, no extra charges</p>
+        <h1 class="hero-title">Order it.<br>We pick it.<br><span class="hl">We drop it.</span></h1>
+        <p class="hero-sub"><strong>Sosick is a delivery service in Nairobi.</strong> Tell us what you want from any shop, market or parcel office. A Sosick rider picks it up and brings it to your gate, hostel or office. You pay when it arrives.</p>
+        <div class="hero-ctas">
+          <a class="btn btn-ink btn-lg" href="#order">Order something now →</a>
+          <a class="btn btn-ghost btn-lg" href="#plugs">Find a trusted seller</a>
+        </div>
+      </div>
+
+      <!-- 3D parcel: each side shows one step. Drag it to spin. -->
+      <div class="parcel-stage" id="parcelStage" aria-label="Sosick parcel showing the three steps: order it, we pick it, we drop it" role="img">
+        <div class="parcel-orbit" aria-hidden="true"><span class="parcel-rider">🛵</span></div>
+        <div class="parcel" id="parcel" aria-hidden="true">
+          <div class="pf pf-front"><b>1</b><span>You<br>order it</span></div>
+          <div class="pf pf-right"><b>2</b><span>We<br>pick it</span></div>
+          <div class="pf pf-back"><b>3</b><span>We<br>drop it</span></div>
+          <div class="pf pf-left"><img src="assets/logo-wordmark-static.svg" alt="" width="150" height="44"><small>Nairobi</small></div>
+          <div class="pf pf-top"></div>
+          <div class="pf pf-bottom"></div>
+        </div>
+        <div class="parcel-shadow" aria-hidden="true"></div>
+        <p class="parcel-hint" aria-hidden="true">Drag the box ↻</p>
+      </div>
     </div>
+
+    <!-- The plain-words facts: no guessing what Sosick is -->
+    <div class="wrap">
+      <ul class="facts" aria-label="Sosick in plain words">
+        <li class="fact"><span class="fact-ico" aria-hidden="true">📦</span><b>What we do</b>We buy or collect what you ask for and bring it to you.</li>
+        <li class="fact"><span class="fact-ico" aria-hidden="true">📍</span><b>Where</b>Nairobi and nearby towns. <a href="#areas">See every area</a></li>
+        <li class="fact"><span class="fact-ico" aria-hidden="true">💸</span><b>What it costs</b><span id="factFee">The item's price plus a delivery fee. We tell you the fee on WhatsApp before the rider leaves.</span></li>
+        <li class="fact"><span class="fact-ico" aria-hidden="true">📲</span><b>How you pay</b>M-Pesa or cash when it arrives, after you check it.</li>
+        <li class="fact"><span class="fact-ico" aria-hidden="true">🙅</span><b>No app, no account</b>The order slip opens WhatsApp. That's all you need.</li>
+      </ul>
+    </div>
+
     <div class="wrap engines">
       <a class="engine engine-sun" href="#order">
-        <span class="engine-tag">Engine 01</span>
+        <span class="engine-tag">Option 1 · You know what you want</span>
         <span class="engine-name">Pick Up &amp; Delivery</span>
         <span class="engine-copy">Tell us what you need and where you are. A Sosick rider picks it up and brings it to you.</span>
         <span class="engine-go">Place an order →</span>
       </a>
       <a class="engine engine-ink" href="#plugs">
-        <span class="engine-tag">Engine 02</span>
+        <span class="engine-tag">Option 2 · You need a seller you can trust</span>
         <span class="engine-name">Verified Plugs</span>
         <span class="engine-copy">Need jeans but no plug? Every seller here has been tested by us before getting the badge.</span>
         <span class="engine-go">Find a plug →</span>
       </a>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS on home, as 3D stairs -->
+  <section class="band band-paper band-stairs">
+    <div class="wrap">
+      <p class="eyebrow">How it works</p>
+      <h2 class="h2">Three steps.<br><span class="hl">Zero stress.</span></h2>
+      <ol class="stairs">
+        <li class="stair"><span class="step-n">1</span><h3>You order</h3><p>Fill the order slip (or chat with Sosi). It opens WhatsApp with your order typed out and an order code like <span class="mono">SOS-1234</span>.</p></li>
+        <li class="stair"><span class="step-n">2</span><h3>We pick it</h3><p>We reply on WhatsApp with the price and delivery fee. Once you say yes, a rider collects it.</p></li>
+        <li class="stair"><span class="step-n">3</span><h3>We drop it</h3><p>The rider brings it to you. You check it, then pay with M-Pesa or cash. Follow it live on <a href="#track">Track</a>.</p></li>
+      </ol>
     </div>
   </section>
 
@@ -118,7 +166,7 @@
         </div>
 
         <div class="field">
-          <label for="pickup">Where do we pick it from?</label>
+          <label for="pickup">Where do we pick it from? <em class="opt">optional</em></label>
           <input id="pickup" type="text" list="placesList" placeholder="Shop name, market or area. Leave blank if you want us to find it" autocomplete="off">
         </div>
 
@@ -128,7 +176,7 @@
             <input id="dropArea" type="text" list="placesList" placeholder="Start typing… e.g. Chiromo" autocomplete="off" required>
           </div>
           <div class="field">
-            <label for="landmark">Landmark / directions</label>
+            <label for="landmark">Landmark / directions <em class="opt">optional</em></label>
             <input id="landmark" type="text" placeholder="e.g. Blue gate opposite Shell, Hall 5">
           </div>
         </div>
@@ -172,6 +220,7 @@
           <p class="fee-line" id="feeLine">Delivery fee: <strong>confirmed on WhatsApp</strong> before pickup. No extra charges.</p>
           <button class="btn btn-ink btn-lg" type="submit">Send order on WhatsApp</button>
         </div>
+        <p class="next-line"><b>What happens next:</b> WhatsApp opens with your order typed out. Press send there. We reply with the price and fee, and nothing moves until you say yes.</p>
         <p class="note privacy-note">We only use these details to deliver your order. <a href="privacy.html">How we handle your details</a></p>
       </form>
 
@@ -316,6 +365,24 @@
     </div>
   </section>
 
+  <!-- STRAIGHT ANSWERS -->
+  <section class="band band-ink" id="faq">
+    <div class="wrap">
+      <p class="eyebrow eyebrow-sun">Straight answers</p>
+      <h2 class="h2">Questions?<br><span class="hl-ink">Asked &amp; answered.</span></h2>
+      <div class="faq">
+        <details open><summary>What can I order?</summary><p>Anything you can buy or collect in Nairobi: clothes and shoes from a shop or market stall, a parcel from a bus office, or something from one of our Verified Plugs. Not sure? Ask on WhatsApp.</p></details>
+        <details><summary>How much is delivery?</summary><p id="faqFee">You pay the item's price plus a delivery fee. We tell you the exact fee on WhatsApp <strong>before</strong> the rider leaves, so there are no surprises.</p></details>
+        <details><summary>When do I pay, and how?</summary><p>When it arrives. Check it first, then pay with M-Pesa or cash.</p></details>
+        <details><summary>Do I need an app or an account?</summary><p>No. Fill the order slip and it opens WhatsApp with everything typed out. Or just text <span class="mono wa-number">0112 275 881</span>.</p></details>
+        <details><summary>Do you deliver to my area?</summary><p>Check the route lists above. Not on them? Order anyway and we'll tell you honestly if a rider can reach you.</p></details>
+        <details><summary>What is a Verified Plug?</summary><p>A seller who passed all five checks of the Sosick Test: we bought from them ourselves first. If they slip, they lose the badge. <a href="#plugs">See the plugs</a></p></details>
+        <details><summary>How do I follow my order?</summary><p>Open <a href="#track">Track</a> and type your order code (like SOS-1234) and the last 4 digits of the phone you ordered with.</p></details>
+        <details><summary>What do you do with my details?</summary><p>We only use them to deliver your order. <a href="privacy.html">Read how we handle your details</a>.</p></details>
+      </div>
+    </div>
+  </section>
+
   </div>
 
 </main>
@@ -369,10 +436,16 @@
   </form>
 </section>
 
-<script src="assets/views.js?v=202610311751"></script>
-<script src="assets/data.js?v=202610311751"></script>
-<script src="assets/cats.js?v=202610311751"></script>
-<script src="assets/app.js?v=202610311751"></script>
-<script src="assets/sosi.js?v=202610311751"></script>
+<!-- Back to top + toast injection -->
+<button id="backToTop" aria-label="Back to top" title="Back to top">↑</button>
+<div id="toastStack" aria-live="polite" aria-atomic="false"></div>
+
+<script src="assets/views.js?v=202611151200"></script>
+<script src="assets/data.js?v=202611151200"></script>
+<script src="assets/cats.js?v=202611151200"></script>
+<script src="assets/app.js?v=202611151200"></script>
+<script src="assets/sosi.js?v=202611151200"></script>
+<script src="assets/fancy.js?v=202611151200"></script>
+<script src="assets/depth.js?v=202611151200"></script>
 </body>
 </html>
