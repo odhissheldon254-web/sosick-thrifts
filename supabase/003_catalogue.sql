@@ -17,6 +17,7 @@ create table if not exists public.categories (
 
 insert into public.categories (id, name, label, emoji, tile, tagline, words, sort) values
   ('kicks',   'Kicks',          'Sneakers & Shoes',       '👟', '#FF5A36', 'AF1s, dad shoes, Timbs, sandals. Fresh or barely worn.',      'sneakers,shoes,kicks,sneaker,airforce,af1,jordans,boots,sandals', 10),
+  ('beads',   'Beads',          'Handmade Beads',         '📿', '#C0362C', 'Handmade by Sosick: bracelets, necklaces, anklets and more.', 'beads,bead,beaded,bracelet,bracelets,necklace,necklaces,anklet,anklets,shanga', 15),
   ('denim',   'Denim',          'Denim & Jeans',          '👖', '#3B6FE0', 'Baggy, straight, ripped, jorts. Every wash, every size.',     'jeans,denim,trouser,trousers,jorts', 20),
   ('tops',    'Tops & Hoodies', 'Tees, Shirts & Hoodies', '👕', '#22A65A', 'Vintage tees, hoodies, jackets and shirts for every mood.',  'tshirt,t-shirt,tee,shirt,hoodie,sweater,top,tops,jacket,jackets', 30),
   ('dresses', 'Dresses',        'Dresses & Skirts',       '👗', '#D6458F', 'From Sunday best to Saturday out.',                          'dress,dresses,skirt,skirts,gown', 40),
